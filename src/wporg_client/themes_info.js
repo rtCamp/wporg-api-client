@@ -67,7 +67,14 @@ const getThemesList = async (args = {}) => {
 
     const action = actions['QUERY_THEMES'];
 
-    const response = await fetchThemesInfo(action, args);
+    let response = await fetchThemesInfo(action, args);
+
+    try {
+        response = await fetchThemesInfo(action, args);
+    } catch (error) {
+        const { message } = error || {};
+        throw new Error(message);
+    }
 
     return response;
 };
@@ -139,7 +146,14 @@ const getThemesBy = async (filter_key, filter_value, page, per_page) => {
         per_page,
     };
 
-    const response = await fetchThemesInfo(action, args);
+    let response = await fetchThemesInfo(action, args);
+
+    try {
+        response = await fetchThemesInfo(action, args);
+    } catch (error) {
+        const { message } = error || {};
+        throw new Error(message);
+    }
 
     return response;
 };
@@ -154,7 +168,7 @@ const getThemesBy = async (filter_key, filter_value, page, per_page) => {
 const getThemeInfo = async (theme_slug, fields) => {
     /** @todo add support for fields */
     if (!theme_slug) {
-        throw new Error('Theme slug is required!');
+        throw new Error('Theme slug is required');
     }
 
     const action = actions['THEME_INFORMATION'];
@@ -163,7 +177,14 @@ const getThemeInfo = async (theme_slug, fields) => {
         slug: theme_slug,
     };
 
-    const response = await fetchThemesInfo(action, args);
+    let response;
+
+    try {
+        response = await fetchThemesInfo(action, args);
+    } catch (error) {
+        const { message } = error || {};
+        throw new Error(message);
+    }
 
     return response;
 };
@@ -174,7 +195,14 @@ const getThemeInfo = async (theme_slug, fields) => {
 const getThemeTagsList = async () => {
     const action = actions['FEATURE_LIST'];
 
-    const response = await fetchThemesInfo(action);
+    let response = await fetchThemesInfo(action);
+
+    try {
+        response = await fetchThemesInfo(action, args);
+    } catch (error) {
+        const { message } = error || {};
+        throw new Error(message);
+    }
 
     return response;
 };
@@ -196,7 +224,14 @@ const getPopularThemeTagsList = async (tags_count) => {
         number: tags_count,
     };
 
-    const response = await fetchThemesInfo(action, args);
+    let response = await fetchThemesInfo(action, args);
+
+    try {
+        response = await fetchThemesInfo(action, args);
+    } catch (error) {
+        const { message } = error || {};
+        throw new Error(message);
+    }
 
     return response;
 };
@@ -209,10 +244,17 @@ const getPopularThemeTagsList = async (tags_count) => {
  */
 const getThemeTranslations = async (slug, version) => {
     if (!slug) {
-        throw new Error('Slug is required!');
+        throw new Error('Slug is required');
     }
 
-    const response = await fetchThemesTranslations(slug, version);
+    let response = await fetchThemesTranslations(slug, version);
+
+    try {
+        response = await fetchThemesInfo(action, args);
+    } catch (error) {
+        const { message } = error || {};
+        throw new Error(message);
+    }
 
     return response;
 };

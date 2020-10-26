@@ -1,15 +1,19 @@
+/** External dependencies */
+import _get from 'lodash/get';
+
 /** Utilities */
 import axios from '../utils/axios_instance';
-import {
-    BASE_URL,
-    THEMES_INFO_API,
-    THEMES_TRANSLATIONS_API,
-} from '../utils/apis';
+import { THEMES_INFO_API, THEMES_TRANSLATIONS_API } from '../utils/apis';
 import {
     THEMES_INFO_VERSION,
     THEMES_TRANSLATIONS_VERSION,
 } from '../utils/versions';
 
+/**
+ * Fetch themes info
+ * @param {String}(required) action
+ * @param {Object}(optional) args
+ */
 const fetchThemesInfo = async (action, args) => {
     let response = {},
         params = {
@@ -46,22 +50,29 @@ const fetchThemesInfo = async (action, args) => {
         });
     }
 
-    console.log(params, 'params');
-
     try {
         const url = `${THEMES_INFO_API}/${THEMES_INFO_VERSION}?${tagsParam}`;
-        console.log(url, 'url');
         response = await axios({
             url,
             params: { ...params },
         });
+
+        if ('error' in _get(response, 'data', {})) {
+            throw new Error(_get(response, 'data.error', {}));
+        }
     } catch (error) {
-        console.log(error, 'error');
+        const { message } = error || {};
+        throw new Error(message);
     }
 
     return response;
 };
 
+/**
+ * Fetch theme translations
+ * @param {String}(optional) slug
+ * @param {String}(optional) version
+ */
 const fetchThemesTranslations = async (slug, version) => {
     let response = {},
         params = {
@@ -69,15 +80,18 @@ const fetchThemesTranslations = async (slug, version) => {
             version,
         };
 
-    console.log(params, 'params');
-
     try {
         response = await axios({
             url: `${THEMES_TRANSLATIONS_API}/${THEMES_TRANSLATIONS_VERSION}`,
             params: { ...params },
         });
+
+        if ('error' in _get(response, 'data', {})) {
+            throw new Error(_get(response, 'data.error', {}));
+        }
     } catch (error) {
-        console.log(error, 'error');
+        const { message } = error || {};
+        throw new Error(message);
     }
 
     return response;
