@@ -5,16 +5,16 @@ import isObject from 'lodash/isObject';
 import {
     fetchThemesInfo,
     fetchThemesTranslations,
-} from '../wporg_server/themes_info';
-
-/** Utilities */
+} from '../../wporg_server/themes_info';
+import actions from './actions';
 import {
-    actions,
     query_themes_args,
     query_themes_filters,
     browse_values,
-} from '../utils/themes_info/arguments';
-import { hasCorrectElementTypesInArray } from '../utils/generic_functions';
+} from './arguments';
+
+/** Utilities */
+import { hasCorrectElementTypesInArray } from '../../utils/generic_functions';
 
 /**
  * Get list of themes

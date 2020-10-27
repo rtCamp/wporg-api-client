@@ -1,16 +1,4 @@
-/***************************************************************************************
- * Themes Info
- ***************************************************************************************/
-
-/** actions */
-const actions = {
-    QUERY_THEMES: 'query_themes',
-    THEME_INFORMATION: 'theme_information',
-    HOT_TAGS: 'hot_tags',
-    FEATURE_LIST: 'feature_list',
-};
-
-/** query_themes */
+/** Arguments for query theme action  */
 const query_themes_args = {
     search: 'string',
     tag: ['string', 'array'],
@@ -22,6 +10,8 @@ const query_themes_args = {
     fields: 'array',
 };
 
+/** Same as above but have removed page and page_no, as in case of filters they are coming as args
+ * not in filters (in method getThemesBy()) */
 const query_themes_filters = {
     search: 'string',
     tag: ['string', 'array'],
@@ -31,6 +21,7 @@ const query_themes_filters = {
     fields: 'array',
 };
 
+/** Possible values for browse filter in query theme action */
 const browse_values = ['popular', 'featured', 'updated', 'new'];
 
-export { actions, query_themes_args, query_themes_filters, browse_values };
+export { query_themes_args, query_themes_filters, browse_values };
