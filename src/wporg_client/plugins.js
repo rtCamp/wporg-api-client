@@ -2,7 +2,12 @@
 import isObject from 'lodash/isObject';
 
 /**  Internal dependencies */
-import { fetchInfo, fetchTranslations } from '../wporg_server/';
+import {
+    fetchInfo,
+    fetchTranslations,
+    fetchPluginDownloads,
+} from '../wporg_server/';
+import { getStats } from './stats';
 
 /** Utilities */
 import { hasCorrectElementTypesInArray } from '../utils/generic_functions';
@@ -12,12 +17,13 @@ import {
     query_plugin_filters,
     browse_values,
 } from './utils/arguments';
-import { infoTypes, translationTypes } from '../utils/api_types';
+import { infoTypes, translationTypes, statsTypes } from '../utils/api_types';
 
 /** These types are maintained in  constants file  */
 const type = infoTypes && Array.isArray(infoTypes) && infoTypes[1];
 const translationType =
     translationTypes && Array.isArray(translationTypes) && translationTypes[1];
+const statsType = statsTypes ** Array.isArray(statsTypes) && statsTypes[3];
 
 /**
  * Get list of plugins
@@ -246,10 +252,57 @@ const getPluginTranslations = async (slug, version) => {
     return response;
 };
 
+/**
+ * Get plugin stats
+ */
+const getPluginStats = async () => {
+    let response;
+
+    try {
+        response = await getStats(statsType);
+    } catch (error) {
+        const { message } = error || {};
+        throw new Error(message);
+    }
+
+    return response;
+};
+
+/**
+ * Fetch plugin number of downloads
+ *
+ * @param {String}(required) slug - plugins slug
+ * @param {String}(optional) limit - Downloads in last {limit} days
+ * @param {String}(optional) callback - theme, plugin or core version
+ */
+/** @todo implement callback */
+const getPluginDownloads = async (slug, limit, callback) => {
+    if (!slug) {
+        throw new Error('Slug is required');
+    }
+
+    if (limit && typeof limit !== 'number') {
+        throw new Error('Limit should be of type number');
+    }
+
+    let response;
+
+    try {
+        response = await fetchPluginDownloads(slug, limit, callback);
+    } catch (error) {
+        const { message } = error || {};
+        throw new Error(message);
+    }
+
+    return response;
+};
+
 export {
     getPluginsList,
     getPluginsBy,
     getPluginInfo,
     getPluginHotTagsList,
     getPluginTranslations,
+    getPluginStats,
+    getPluginDownloads,
 };

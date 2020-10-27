@@ -3,7 +3,12 @@ import _get from 'lodash/get';
 
 /** Utilities */
 import axios from '../utils/axios_instance';
-import { INFO_API, TRANSLATIONS_API } from '../utils/apis';
+import {
+    INFO_API,
+    TRANSLATIONS_API,
+    STATS_API,
+    PLUGIN_DOWNLOADS_API,
+} from '../utils/apis';
 import { DEFAULT_API_VERSIONS } from '../utils/versions';
 import { infoTypes } from '../utils/api_types';
 
@@ -84,7 +89,7 @@ const fetchInfo = async (type, action, args, version) => {
 };
 
 /**
- * Fetch theme translations
+ * Fetch translations
  *
  * @param {String}(required) type - themes | plugins | core @todo create handler to check
  * @param {String}(optional) slug
@@ -117,4 +122,68 @@ const fetchTranslations = async (type, slug, version) => {
     return response;
 };
 
-export { fetchInfo, fetchTranslations };
+/**
+ * Fetch stats
+ *
+ * @param {String}(required) type - themes | plugins | core @todo create handler to check
+ * @param {String}(optional) slug
+ * @param {String}(optional) version - theme, plugin or core version
+ */
+const fetchStats = async (type) => {
+    let response = {};
+
+    try {
+        const apiVersion = DEFAULT_API_VERSIONS['stats'];
+        const url = `${STATS_API}/${type}/${apiVersion}`;
+
+        response = await axios({
+            url,
+        });
+
+        if ('error' in _get(response, 'data', {})) {
+            throw new Error(_get(response, 'data.error', {}));
+        }
+    } catch (error) {
+        const { message } = error || {};
+        throw new Error(message);
+    }
+
+    return response;
+};
+
+/**
+ * Fetch plugin number of downloads
+ *
+ * @param {String}(required) slug - plugins slug
+ * @param {String}(optional) limit - No of days
+ * @param {String}(optional) callback - theme, plugin or core version
+ */
+const fetchPluginDownloads = async (slug, limit, callback) => {
+    let response = {},
+        params = {
+            slug,
+            limit,
+            callback,
+        };
+
+    try {
+        const apiVersion = DEFAULT_API_VERSIONS['stats'];
+        const url = `${STATS_API}/plugin/${apiVersion}${PLUGIN_DOWNLOADS_API}`;
+
+        response = await axios({
+            url,
+            params: { ...params },
+        });
+
+        if ('error' in _get(response, 'data', {})) {
+            throw new Error(_get(response, 'data.error', {}));
+        }
+    } catch (error) {
+        const { message } = error || {};
+        throw new Error(message);
+    }
+
+    return response;
+};
+
+export { fetchInfo, fetchTranslations, fetchStats, fetchPluginDownloads };

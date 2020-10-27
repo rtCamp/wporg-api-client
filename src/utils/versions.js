@@ -23,6 +23,7 @@ const DEFAULT_API_VERSIONS = {
     themes: '1.1',
     plugins: '1.2',
     translations: '1.0',
+    stats: '1.0',
 };
 
 export { DEFAULT_API_VERSIONS };

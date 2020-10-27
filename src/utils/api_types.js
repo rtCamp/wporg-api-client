@@ -10,4 +10,6 @@ const infoTypes = ['themes', 'plugins'];
  */
 const translationTypes = ['themes', 'plugins', 'core'];
 
-export { infoTypes, translationTypes };
+const statsTypes = ['wordpress', 'php', 'mysql', 'plugin'];
+
+export { infoTypes, translationTypes, statsTypes };
