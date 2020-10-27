@@ -2,19 +2,20 @@
 import isObject from 'lodash/isObject';
 
 /**  Internal dependencies */
-import {
-    fetchThemesInfo,
-    fetchThemesTranslations,
-} from '../../wporg_server/themes_info';
-import actions from './actions';
+import { fetchInfo, fetchThemesTranslations } from '../wporg_server/';
+
+/** Utilities */
+import { hasCorrectElementTypesInArray } from '../utils/generic_functions';
+import { themesActions } from './utils/actions';
 import {
     query_themes_args,
     query_themes_filters,
     browse_values,
-} from './arguments';
+} from './utils/arguments';
+import { infoTypes } from '../utils/constants';
 
-/** Utilities */
-import { hasCorrectElementTypesInArray } from '../../utils/generic_functions';
+/** Info type if maintained in infoTypes in constants file  */
+const type = infoTypes && Array.isArray(infoTypes) && infoTypes[0];
 
 /**
  * Get list of themes
@@ -65,12 +66,12 @@ const getThemesList = async (args = {}) => {
         }
     }
 
-    const action = actions['QUERY_THEMES'];
+    let response;
 
-    let response = await fetchThemesInfo(action, args);
+    const action = themesActions['QUERY_THEMES'];
 
     try {
-        response = await fetchThemesInfo(action, args);
+        response = await fetchInfo(type, action, args);
     } catch (error) {
         const { message } = error || {};
         throw new Error(message);
@@ -138,7 +139,9 @@ const getThemesBy = async (filter_key, filter_value, page, per_page) => {
         throw new Error(`page and per_page should be number`);
     }
 
-    const action = actions['QUERY_THEMES'];
+    let response;
+
+    const action = themesActions['QUERY_THEMES'];
 
     const args = {
         [filter_key]: filter_value,
@@ -146,10 +149,8 @@ const getThemesBy = async (filter_key, filter_value, page, per_page) => {
         per_page,
     };
 
-    let response = await fetchThemesInfo(action, args);
-
     try {
-        response = await fetchThemesInfo(action, args);
+        response = await fetchInfo(type, action, args);
     } catch (error) {
         const { message } = error || {};
         throw new Error(message);
@@ -171,16 +172,16 @@ const getThemeInfo = async (theme_slug, fields) => {
         throw new Error('Theme slug is required');
     }
 
-    const action = actions['THEME_INFORMATION'];
+    let response;
+
+    const action = themesActions['THEME_INFORMATION'];
 
     const args = {
         slug: theme_slug,
     };
 
-    let response;
-
     try {
-        response = await fetchThemesInfo(action, args);
+        response = await fetchInfo(type, action, args);
     } catch (error) {
         const { message } = error || {};
         throw new Error(message);
@@ -193,12 +194,12 @@ const getThemeInfo = async (theme_slug, fields) => {
  * Get list of valid theme tags
  */
 const getThemeTagsList = async () => {
-    const action = actions['FEATURE_LIST'];
+    let response;
 
-    let response = await fetchThemesInfo(action);
+    const action = themesActions['FEATURE_LIST'];
 
     try {
-        response = await fetchThemesInfo(action, args);
+        response = await fetchInfo(type, action);
     } catch (error) {
         const { message } = error || {};
         throw new Error(message);
@@ -210,24 +211,24 @@ const getThemeTagsList = async () => {
 /**
  * Get list of most popular theme tags
  *
- * @param {Number} number(optional) - The amount of tags to return
+ * @param {Number} tags_count(optional) - The number of tags to return
  */
-const getPopularThemeTagsList = async (tags_count) => {
+const getThemeHotTagsList = async (tags_count) => {
     /** If tags count is of incorrect type */
     if (tags_count && typeof tags_count !== 'number') {
         throw new Error('tags_count should be number');
     }
 
-    const action = actions['HOT_TAGS'];
+    const action = themesActions['HOT_TAGS'];
 
     const args = {
         number: tags_count,
     };
 
-    let response = await fetchThemesInfo(action, args);
+    let response;
 
     try {
-        response = await fetchThemesInfo(action, args);
+        response = await fetchInfo(type, action, args);
     } catch (error) {
         const { message } = error || {};
         throw new Error(message);
@@ -247,10 +248,10 @@ const getThemeTranslations = async (slug, version) => {
         throw new Error('Slug is required');
     }
 
-    let response = await fetchThemesTranslations(slug, version);
+    let response;
 
     try {
-        response = await fetchThemesInfo(action, args);
+        response = await fetchThemesTranslations(action, args);
     } catch (error) {
         const { message } = error || {};
         throw new Error(message);
@@ -260,10 +261,10 @@ const getThemeTranslations = async (slug, version) => {
 };
 
 export {
-    getThemeInfo,
     getThemesList,
     getThemesBy,
+    getThemeInfo,
     getThemeTagsList,
-    getPopularThemeTagsList,
+    getThemeHotTagsList,
     getThemeTranslations,
 };
