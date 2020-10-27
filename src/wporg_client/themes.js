@@ -12,7 +12,7 @@ import {
     query_themes_filters,
     browse_values,
 } from './utils/arguments';
-import { infoTypes, translationTypes } from '../utils/constants';
+import { infoTypes, translationTypes } from '../utils/api_types';
 
 /** These types are maintained in  constants file  */
 const infoType = infoTypes && Array.isArray(infoTypes) && infoTypes[0];

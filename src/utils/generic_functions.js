@@ -1,5 +1,6 @@
 /**
  * Checks types of an array elements
+ *
  * @param {Array} array
  * @param {String} type
  */

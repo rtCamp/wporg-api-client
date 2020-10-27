@@ -5,7 +5,7 @@ import _get from 'lodash/get';
 import axios from '../utils/axios_instance';
 import { INFO_API, TRANSLATIONS_API } from '../utils/apis';
 import { defaultApiVersions } from '../utils/versions';
-import { infoTypes } from '../utils/constants';
+import { infoTypes } from '../utils/api_types';
 
 /**
  * Fetch themes or plugin info
@@ -99,8 +99,8 @@ const fetchTranslations = async (type, slug, version) => {
 
     try {
         const apiVersion = defaultApiVersions['translations'];
-        let url = `${TRANSLATIONS_API}/${type}/${apiVersion}`;
-        console.log(apiVersion, url, params, 'apiVersion, url, params,');
+        const url = `${TRANSLATIONS_API}/${type}/${apiVersion}`;
+
         response = await axios({
             url,
             params: { ...params },
