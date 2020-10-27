@@ -4,7 +4,7 @@ import _get from 'lodash/get';
 /** Utilities */
 import axios from '../utils/axios_instance';
 import { INFO_API, TRANSLATIONS_API } from '../utils/apis';
-import { defaultApiVersions } from '../utils/versions';
+import { DEFAULT_API_VERSIONS } from '../utils/versions';
 import { infoTypes } from '../utils/api_types';
 
 /**
@@ -56,8 +56,8 @@ const fetchInfo = async (type, action, args, version) => {
     try {
         /** Use default version if not passed */
         if (!version) {
-            if (type in defaultApiVersions) {
-                version = defaultApiVersions[type];
+            if (type in DEFAULT_API_VERSIONS) {
+                version = DEFAULT_API_VERSIONS[type];
             } else {
                 throw new Error(
                     `Type ${type} is incorrect, available types are ${infoTypes}`,
@@ -98,7 +98,7 @@ const fetchTranslations = async (type, slug, version) => {
         };
 
     try {
-        const apiVersion = defaultApiVersions['translations'];
+        const apiVersion = DEFAULT_API_VERSIONS['translations'];
         const url = `${TRANSLATIONS_API}/${type}/${apiVersion}`;
 
         response = await axios({

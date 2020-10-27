@@ -19,10 +19,10 @@
  * 1.2 - Returns content in JSON object and only accepts GET requests
  */
 
-const defaultApiVersions = {
+const DEFAULT_API_VERSIONS = {
     themes: '1.1',
     plugins: '1.2',
     translations: '1.0',
 };
 
-export { defaultApiVersions };
+export { DEFAULT_API_VERSIONS };
