@@ -3,7 +3,7 @@ import _get from 'lodash/get';
 
 /** Utilities */
 import axios from '../utils/axios_instance';
-import { THEMES_TRANSLATIONS_API } from '../utils/apis';
+import { INFO_API, TRANSLATIONS_API } from '../utils/apis';
 import { defaultApiVersions } from '../utils/versions';
 import { infoTypes } from '../utils/constants';
 
@@ -64,7 +64,7 @@ const fetchInfo = async (type, action, args, version) => {
                 );
             }
         }
-        const url = `/${type}/info/${version}?${tagsParam}`;
+        const url = `/${type}${INFO_API}/${version}?${tagsParam}`;
 
         response = await axios({
             url,
@@ -85,10 +85,12 @@ const fetchInfo = async (type, action, args, version) => {
 
 /**
  * Fetch theme translations
+ *
+ * @param {String}(required) type - themes | plugins | core @todo create handler to check
  * @param {String}(optional) slug
- * @param {String}(optional) version
+ * @param {String}(optional) version - theme, plugin or core version
  */
-const fetchThemesTranslations = async (slug, version) => {
+const fetchTranslations = async (type, slug, version) => {
     let response = {},
         params = {
             slug,
@@ -96,8 +98,11 @@ const fetchThemesTranslations = async (slug, version) => {
         };
 
     try {
+        const apiVersion = defaultApiVersions['translations'];
+        let url = `${TRANSLATIONS_API}/${type}/${apiVersion}`;
+        console.log(apiVersion, url, params, 'apiVersion, url, params,');
         response = await axios({
-            url: `${THEMES_TRANSLATIONS_API}/${THEMES_TRANSLATIONS_VERSION}`,
+            url,
             params: { ...params },
         });
 
@@ -112,4 +117,4 @@ const fetchThemesTranslations = async (slug, version) => {
     return response;
 };
 
-export { fetchInfo, fetchThemesTranslations };
+export { fetchInfo, fetchTranslations };

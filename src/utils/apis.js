@@ -1,6 +1,7 @@
 const BASE_URL = 'https://api.wordpress.org';
 
-const THEMES_INFO_API = '/themes/info';
-const THEMES_TRANSLATIONS_API = '/translations/themes';
+const INFO_API = '/info';
 
-export { BASE_URL, THEMES_INFO_API, THEMES_TRANSLATIONS_API };
+const TRANSLATIONS_API = '/translations';
+
+export { BASE_URL, INFO_API, TRANSLATIONS_API };

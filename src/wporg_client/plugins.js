@@ -2,7 +2,7 @@
 import isObject from 'lodash/isObject';
 
 /**  Internal dependencies */
-import { fetchInfo } from '../wporg_server/';
+import { fetchInfo, fetchTranslations } from '../wporg_server/';
 
 /** Utilities */
 import { hasCorrectElementTypesInArray } from '../utils/generic_functions';
@@ -12,10 +12,12 @@ import {
     query_plugin_filters,
     browse_values,
 } from './utils/arguments';
-import { infoTypes } from '../utils/constants';
+import { infoTypes, translationTypes } from '../utils/constants';
 
-/** Info type if maintained in infoTypes in constants file  */
+/** These types are maintained in  constants file  */
 const type = infoTypes && Array.isArray(infoTypes) && infoTypes[1];
+const translationType =
+    translationTypes && Array.isArray(translationTypes) && translationTypes[1];
 
 /**
  * Get list of plugins
@@ -221,4 +223,33 @@ const getPluginHotTagsList = async (tags_count) => {
     return response;
 };
 
-export { getPluginsList, getPluginsBy, getPluginInfo, getPluginHotTagsList };
+/**
+ * Get plugin translations
+ *
+ * @param {String} slug(required) - Plugin slug
+ * @param {String} version(optional) - Plugin version, fallbacks to the latest version of not passed
+ */
+const getPluginTranslations = async (slug, version) => {
+    if (!slug) {
+        throw new Error('Slug is required');
+    }
+
+    let response;
+
+    try {
+        response = await fetchTranslations(translationType, slug, version);
+    } catch (error) {
+        const { message } = error || {};
+        throw new Error(message);
+    }
+
+    return response;
+};
+
+export {
+    getPluginsList,
+    getPluginsBy,
+    getPluginInfo,
+    getPluginHotTagsList,
+    getPluginTranslations,
+};
