@@ -1,7 +1,7 @@
 /**  Internal dependencies */
 import { fetchTranslations } from '../wporg_server/';
 
-import { translationTypes } from '../utils/constants';
+import { translationTypes } from '../utils/api_types';
 
 /** These types are maintained in  constants file  */
 const translationType =
