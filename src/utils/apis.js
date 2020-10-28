@@ -17,6 +17,10 @@ const CORE_CHECKSUMS_API = '/core/checksums';
 
 const EVENTS_API = '/events';
 
+const SECRET_KEY_API = '/secret-key';
+
+const SALT_API = '/salt';
+
 export {
     BASE_URL,
     INFO_API,
@@ -27,4 +31,6 @@ export {
     CORE_CREDITS_API,
     CORE_CHECKSUMS_API,
     EVENTS_API,
+    SECRET_KEY_API,
+    SALT_API,
 };

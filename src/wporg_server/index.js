@@ -12,6 +12,8 @@ import {
     CORE_CREDITS_API,
     CORE_CHECKSUMS_API,
     EVENTS_API,
+    SECRET_KEY_API,
+    SALT_API,
 } from '../utils/apis';
 import { DEFAULT_API_VERSIONS } from '../utils/versions';
 import { infoTypes } from '../utils/api_types';
@@ -355,6 +357,27 @@ const fetchEventDetails = async (args) => {
     return response;
 };
 
+/**
+ * Secret key generator for wp-config.php
+ */
+const generateSecretKey = async () => {
+    let response = {};
+
+    try {
+        const apiVersion = DEFAULT_API_VERSIONS['secret-key'];
+        const url = `${SECRET_KEY_API}/${apiVersion}${SALT_API}`;
+        console.log(url, 'url');
+        response = await axios({
+            url,
+        });
+    } catch (error) {
+        const { message } = error || {};
+        throw new Error(message);
+    }
+
+    return response;
+};
+
 export {
     fetchInfo,
     fetchTranslations,
@@ -364,4 +387,5 @@ export {
     fetchCoreCreditDetails,
     fetchCoreChecksums,
     fetchEventDetails,
+    generateSecretKey,
 };

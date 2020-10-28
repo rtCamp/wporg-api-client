@@ -28,6 +28,7 @@ const DEFAULT_API_VERSIONS = {
     credits: '1.1',
     checksums: '1.0',
     events: '1.0',
+    'secret-key': '1.1',
 };
 
 export { DEFAULT_API_VERSIONS };
