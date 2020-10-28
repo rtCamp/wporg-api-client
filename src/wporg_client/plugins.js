@@ -273,10 +273,8 @@ const getPluginStats = async () => {
  *
  * @param {String}(required) slug - plugins slug
  * @param {String}(optional) limit - Downloads in last {limit} days
- * @param {String}(optional) callback - theme, plugin or core version
  */
-/** @todo implement callback */
-const getPluginDownloads = async (slug, limit, callback) => {
+const getPluginDownloads = async (slug, limit) => {
     if (!slug) {
         throw new Error('Slug is required');
     }
@@ -288,7 +286,7 @@ const getPluginDownloads = async (slug, limit, callback) => {
     let response;
 
     try {
-        response = await fetchPluginDownloads(slug, limit, callback);
+        response = await fetchPluginDownloads(slug, limit);
     } catch (error) {
         const { message } = error || {};
         throw new Error(message);

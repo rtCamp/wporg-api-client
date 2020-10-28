@@ -172,14 +172,12 @@ const fetchStats = async (type) => {
  *
  * @param {String}(required) slug - plugins slug
  * @param {String}(optional) limit - No of days
- * @param {String}(optional) callback - theme, plugin or core version
  */
-const fetchPluginDownloads = async (slug, limit, callback) => {
+const fetchPluginDownloads = async (slug, limit) => {
     let response = {},
         params = {
             slug,
             limit,
-            callback,
         };
 
     try {
@@ -193,7 +191,7 @@ const fetchPluginDownloads = async (slug, limit, callback) => {
 
         /** Throw error if api returns error object */
         const responseData = _get(response, 'data', {}) || {};
-
+        console.log(responseData, 'responseData');
         if ('error' in responseData) {
             throw new Error(_get(response, 'data.error', {}));
         }
