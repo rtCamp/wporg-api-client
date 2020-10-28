@@ -4,6 +4,7 @@ import {
     fetchCoreVersionInfo,
     fetchCoreCreditDetails,
     fetchCoreChecksums,
+    fetchBrowserInfo,
 } from '../wporg_server/';
 
 import { translationTypes } from '../utils/api_types';
@@ -117,9 +118,32 @@ const getCoreChecksums = async (version, locale) => {
     return response;
 };
 
+/**
+ * Fetch browser details
+ *
+ * @param {String} useragent
+ */
+const getBrowserInfo = async (useragent) => {
+    if (!useragent || typeof useragent !== 'string') {
+        throw new Error('useragent is required and should be string');
+    }
+
+    let response;
+
+    try {
+        response = await fetchBrowserInfo(useragent);
+    } catch (error) {
+        const { message } = error || {};
+        throw new Error(message);
+    }
+
+    return response;
+};
+
 export {
     getCoreTranslations,
     getCoreVersionInfo,
     getCoreCreditDetails,
     getCoreChecksums,
+    getBrowserInfo,
 };

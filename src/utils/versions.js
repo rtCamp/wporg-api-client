@@ -29,6 +29,7 @@ const DEFAULT_API_VERSIONS = {
     checksums: '1.0',
     events: '1.0',
     'secret-key': '1.1',
+    'browse-happy': '1.1',
 };
 
 export { DEFAULT_API_VERSIONS };

@@ -21,6 +21,8 @@ const SECRET_KEY_API = '/secret-key';
 
 const SALT_API = '/salt';
 
+const BROWSE_HAPPY_API = '/core/browse-happy';
+
 export {
     BASE_URL,
     INFO_API,
@@ -33,4 +35,5 @@ export {
     EVENTS_API,
     SECRET_KEY_API,
     SALT_API,
+    BROWSE_HAPPY_API,
 };

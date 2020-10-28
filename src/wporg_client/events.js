@@ -51,6 +51,9 @@ const getEventDetails = async (args) => {
 
     try {
         response = await fetchEventDetails(args);
+        /** The date and end_date fields in the response are in the event's local
+         * timezone, not UTC.
+         * */
     } catch (error) {
         const { message } = error || {};
         throw new Error(message);

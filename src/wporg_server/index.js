@@ -14,6 +14,7 @@ import {
     EVENTS_API,
     SECRET_KEY_API,
     SALT_API,
+    BROWSE_HAPPY_API,
 } from '../utils/apis';
 import { DEFAULT_API_VERSIONS } from '../utils/versions';
 import { infoTypes } from '../utils/api_types';
@@ -378,6 +379,34 @@ const generateSecretKey = async () => {
     return response;
 };
 
+/**
+ * Fetch browser details
+ *
+ * @param {String} useragent
+ */
+const fetchBrowserInfo = async (useragent) => {
+    let response = {},
+        params = {
+            useragent,
+        };
+
+    try {
+        const apiVersion = DEFAULT_API_VERSIONS['browse-happy'];
+
+        const url = `${BROWSE_HAPPY_API}/${apiVersion}`;
+
+        response = await axios({
+            url,
+            params: { ...params },
+        });
+    } catch (error) {
+        const { message } = error || {};
+        throw new Error(message);
+    }
+
+    return response;
+};
+
 export {
     fetchInfo,
     fetchTranslations,
@@ -388,4 +417,5 @@ export {
     fetchCoreChecksums,
     fetchEventDetails,
     generateSecretKey,
+    fetchBrowserInfo,
 };
