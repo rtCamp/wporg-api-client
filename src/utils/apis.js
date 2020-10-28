@@ -23,6 +23,8 @@ const SALT_API = '/salt';
 
 const BROWSE_HAPPY_API = '/core/browse-happy';
 
+const POPULAR_IMPORT_PLUGINS = '/core/importers';
+
 export {
     BASE_URL,
     INFO_API,
@@ -36,4 +38,5 @@ export {
     SECRET_KEY_API,
     SALT_API,
     BROWSE_HAPPY_API,
+    POPULAR_IMPORT_PLUGINS,
 };

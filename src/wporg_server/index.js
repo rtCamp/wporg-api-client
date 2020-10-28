@@ -15,6 +15,7 @@ import {
     SECRET_KEY_API,
     SALT_API,
     BROWSE_HAPPY_API,
+    POPULAR_IMPORT_PLUGINS,
 } from '../utils/apis';
 import { DEFAULT_API_VERSIONS } from '../utils/versions';
 import { infoTypes } from '../utils/api_types';
@@ -392,12 +393,33 @@ const fetchBrowserInfo = async (useragent) => {
 
     try {
         const apiVersion = DEFAULT_API_VERSIONS['browse-happy'];
-
         const url = `${BROWSE_HAPPY_API}/${apiVersion}`;
 
         response = await axios({
             url,
             params: { ...params },
+        });
+    } catch (error) {
+        const { message } = error || {};
+        throw new Error(message);
+    }
+
+    return response;
+};
+
+/**
+ * List of popular import plugins in the WordPress Plugin Directory used by
+ * Tools → Import Screen.
+ */
+const fetchPopularImportPlugins = async () => {
+    let response = {};
+
+    try {
+        const apiVersion = DEFAULT_API_VERSIONS['importers'];
+        const url = `${POPULAR_IMPORT_PLUGINS}/${apiVersion}`;
+
+        response = await axios({
+            url,
         });
     } catch (error) {
         const { message } = error || {};
@@ -418,4 +440,5 @@ export {
     fetchEventDetails,
     generateSecretKey,
     fetchBrowserInfo,
+    fetchPopularImportPlugins,
 };
