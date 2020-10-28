@@ -1,5 +1,9 @@
 /**  Internal dependencies */
-import { fetchTranslations, fetchCoreVersionInfo } from '../wporg_server/';
+import {
+    fetchTranslations,
+    fetchCoreVersionInfo,
+    fetchCoreCreditDetails,
+} from '../wporg_server/';
 
 import { translationTypes } from '../utils/api_types';
 
@@ -54,4 +58,30 @@ const getCoreVersionInfo = async (version, locale) => {
     return response;
 };
 
-export { getCoreTranslations, getCoreVersionInfo };
+/**
+ * Fetch details of individual contributors in wordpress codebase
+ *
+ * @param {String}(optional) version
+ * @param {String}(optional) locale
+ */
+const getCoreCreditDetails = async (version, locale) => {
+    if (
+        (version && typeof version !== 'string') ||
+        (locale && typeof locale !== 'string')
+    ) {
+        throw new Error('version and locale should be in string');
+    }
+
+    let response;
+
+    try {
+        response = await fetchCoreCreditDetails(version, locale);
+    } catch (error) {
+        const { message } = error || {};
+        throw new Error(message);
+    }
+
+    return response;
+};
+
+export { getCoreTranslations, getCoreVersionInfo, getCoreCreditDetails };

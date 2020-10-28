@@ -11,6 +11,8 @@ const PLUGIN_DOWNLOADS_API = '/downloads.php';
 
 const CORE_VERSION_CHECK_API = '/core/version-check';
 
+const CORE_CREDITS_API = '/core/credits';
+
 export {
     BASE_URL,
     INFO_API,
@@ -18,4 +20,5 @@ export {
     STATS_API,
     PLUGIN_DOWNLOADS_API,
     CORE_VERSION_CHECK_API,
+    CORE_CREDITS_API,
 };

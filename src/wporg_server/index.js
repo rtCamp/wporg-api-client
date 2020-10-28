@@ -9,6 +9,7 @@ import {
     STATS_API,
     PLUGIN_DOWNLOADS_API,
     CORE_VERSION_CHECK_API,
+    CORE_CREDITS_API,
 } from '../utils/apis';
 import { DEFAULT_API_VERSIONS } from '../utils/versions';
 import { infoTypes } from '../utils/api_types';
@@ -78,7 +79,9 @@ const fetchInfo = async (type, action, args, version) => {
         });
 
         /** Throw error if api returns error object */
-        if ('error' in _get(response, 'data', {})) {
+        const responseData = _get(response, 'data', {}) || {};
+
+        if ('error' in responseData) {
             throw new Error(_get(response, 'data.error', {}));
         }
     } catch (error) {
@@ -112,7 +115,10 @@ const fetchTranslations = async (type, slug, version) => {
             params: { ...params },
         });
 
-        if ('error' in _get(response, 'data', {})) {
+        /** Throw error if api returns error object */
+        const responseData = _get(response, 'data', {}) || {};
+
+        if ('error' in responseData) {
             throw new Error(_get(response, 'data.error', {}));
         }
     } catch (error) {
@@ -141,7 +147,10 @@ const fetchStats = async (type) => {
             url,
         });
 
-        if ('error' in _get(response, 'data', {})) {
+        /** Throw error if api returns error object */
+        const responseData = _get(response, 'data', {}) || {};
+
+        if ('error' in responseData) {
             throw new Error(_get(response, 'data.error', {}));
         }
     } catch (error) {
@@ -176,7 +185,10 @@ const fetchPluginDownloads = async (slug, limit, callback) => {
             params: { ...params },
         });
 
-        if ('error' in _get(response, 'data', {})) {
+        /** Throw error if api returns error object */
+        const responseData = _get(response, 'data', {}) || {};
+
+        if ('error' in responseData) {
             throw new Error(_get(response, 'data.error', {}));
         }
     } catch (error) {
@@ -209,8 +221,47 @@ const fetchCoreVersionInfo = async (version, locale) => {
             params: { ...params },
         });
 
-        if ('error' in _get(response, 'data', {})) {
+        /** Throw error if api returns error object */
+        const responseData = _get(response, 'data', {}) || {};
+
+        if ('error' in responseData) {
             throw new Error(_get(response, 'data.error', {}));
+        }
+    } catch (error) {
+        const { message } = error || {};
+        throw new Error(message);
+    }
+
+    return response;
+};
+
+/**
+ * Fetch details of individual contributors in wordpress codebase
+ *
+ * @param {String}(optional) version
+ * @param {String}(optional) locale
+ */
+const fetchCoreCreditDetails = async (version, locale) => {
+    let response = {},
+        params = {
+            version,
+            locale,
+        };
+
+    try {
+        const apiVersion = DEFAULT_API_VERSIONS['credits'];
+        const url = `${CORE_CREDITS_API}/${apiVersion}`;
+
+        response = await axios({
+            url,
+            params: { ...params },
+        });
+
+        /** Throw error if api returns error object */
+        const responseData = _get(response, 'data', {}) || {};
+
+        if ('error' in responseData) {
+            throw new Error(_get(response, 'data.error', {}) || {});
         }
     } catch (error) {
         const { message } = error || {};
@@ -226,4 +277,5 @@ export {
     fetchStats,
     fetchPluginDownloads,
     fetchCoreVersionInfo,
+    fetchCoreCreditDetails,
 };
