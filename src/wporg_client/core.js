@@ -3,6 +3,7 @@ import {
     fetchTranslations,
     fetchCoreVersionInfo,
     fetchCoreCreditDetails,
+    fetchCoreChecksums,
 } from '../wporg_server/';
 
 import { translationTypes } from '../utils/api_types';
@@ -84,4 +85,41 @@ const getCoreCreditDetails = async (version, locale) => {
     return response;
 };
 
-export { getCoreTranslations, getCoreVersionInfo, getCoreCreditDetails };
+/**
+ * Returns a JSON encoded array of file MD5 checksums for a given WordPress
+ * release / locale. Although english is the default, it's suggested to pass
+ * it for 100% compatibility with core.
+ *
+ * @param {String}(required) version
+ * @param {String}(optional) locale
+ */
+const getCoreChecksums = async (version, locale) => {
+    if (!version) {
+        throw new Error('version is required');
+    }
+
+    if (
+        (version && typeof version !== 'string') ||
+        (locale && typeof locale !== 'string')
+    ) {
+        throw new Error('version and locale should be in string');
+    }
+
+    let response;
+
+    try {
+        response = await fetchCoreChecksums(version, locale);
+    } catch (error) {
+        const { message } = error || {};
+        throw new Error(message);
+    }
+
+    return response;
+};
+
+export {
+    getCoreTranslations,
+    getCoreVersionInfo,
+    getCoreCreditDetails,
+    getCoreChecksums,
+};

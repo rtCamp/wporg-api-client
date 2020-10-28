@@ -10,6 +10,7 @@ import {
     PLUGIN_DOWNLOADS_API,
     CORE_VERSION_CHECK_API,
     CORE_CREDITS_API,
+    CORE_CHECKSUMS_API,
 } from '../utils/apis';
 import { DEFAULT_API_VERSIONS } from '../utils/versions';
 import { infoTypes } from '../utils/api_types';
@@ -271,6 +272,44 @@ const fetchCoreCreditDetails = async (version, locale) => {
     return response;
 };
 
+/**
+ * Returns a JSON encoded array of file MD5 checksums for a given WordPress
+ * release / locale. Although english is the default, it's suggested to pass
+ * it for 100% compatibility with core.
+ *
+ * @param {String}(required) version
+ * @param {String}(optional) locale
+ */
+const fetchCoreChecksums = async (version, locale) => {
+    let response = {},
+        params = {
+            version,
+            locale,
+        };
+
+    try {
+        const apiVersion = DEFAULT_API_VERSIONS['checksums'];
+        const url = `${CORE_CHECKSUMS_API}/${apiVersion}`;
+
+        response = await axios({
+            url,
+            params: { ...params },
+        });
+
+        /** Throw error if api returns error object */
+        const responseData = _get(response, 'data', {}) || {};
+
+        if ('error' in responseData) {
+            throw new Error(_get(response, 'data.error', {}) || {});
+        }
+    } catch (error) {
+        const { message } = error || {};
+        throw new Error(message);
+    }
+
+    return response;
+};
+
 export {
     fetchInfo,
     fetchTranslations,
@@ -278,4 +317,5 @@ export {
     fetchPluginDownloads,
     fetchCoreVersionInfo,
     fetchCoreCreditDetails,
+    fetchCoreChecksums,
 };
