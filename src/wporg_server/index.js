@@ -183,7 +183,7 @@ const fetchPluginDownloads = async (slug, limit) => {
     try {
         const apiVersion = DEFAULT_API_VERSIONS['stats'];
         const url = `${STATS_API}/plugin/${apiVersion}${PLUGIN_DOWNLOADS_API}`;
-
+        console.log(url, 'url');
         response = await axios({
             url,
             params: { ...params },
