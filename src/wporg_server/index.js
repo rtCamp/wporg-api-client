@@ -8,6 +8,7 @@ import {
     TRANSLATIONS_API,
     STATS_API,
     PLUGIN_DOWNLOADS_API,
+    CORE_VERSION_CHECK_API,
 } from '../utils/apis';
 import { DEFAULT_API_VERSIONS } from '../utils/versions';
 import { infoTypes } from '../utils/api_types';
@@ -186,4 +187,43 @@ const fetchPluginDownloads = async (slug, limit, callback) => {
     return response;
 };
 
-export { fetchInfo, fetchTranslations, fetchStats, fetchPluginDownloads };
+/**
+ * Fetch wordpress version info
+ *
+ * @param {String}(optional) version - To fetch versions released after given version
+ * @param {String}(optional) locale - Locale
+ */
+const fetchCoreVersionInfo = async (version, locale) => {
+    let response = {},
+        params = {
+            version,
+            locale,
+        };
+
+    try {
+        const apiVersion = DEFAULT_API_VERSIONS['version-check'];
+        const url = `${CORE_VERSION_CHECK_API}/${apiVersion}`;
+
+        response = await axios({
+            url,
+            params: { ...params },
+        });
+
+        if ('error' in _get(response, 'data', {})) {
+            throw new Error(_get(response, 'data.error', {}));
+        }
+    } catch (error) {
+        const { message } = error || {};
+        throw new Error(message);
+    }
+
+    return response;
+};
+
+export {
+    fetchInfo,
+    fetchTranslations,
+    fetchStats,
+    fetchPluginDownloads,
+    fetchCoreVersionInfo,
+};

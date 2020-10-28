@@ -24,6 +24,7 @@ const DEFAULT_API_VERSIONS = {
     plugins: '1.2',
     translations: '1.0',
     stats: '1.0',
+    'version-check': '1.7',
 };
 
 export { DEFAULT_API_VERSIONS };
