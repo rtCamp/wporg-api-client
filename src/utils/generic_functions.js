@@ -40,7 +40,16 @@ const doesElementHaveOneOfType = (element, type_array) => {
 
     const elementType = typeof element;
 
-    if (type_array.indexOf(elementType) !== -1) {
+    /** If type is an array because typeof array is object */
+    if (type_array.indexOf('array') !== -1) {
+        type_array.forEach((type) => {
+            if (type === 'array' && Array.isArray(element)) {
+                return true;
+            } else if (elementType === type) {
+                return true;
+            }
+        });
+    } else if (type_array.indexOf(elementType) !== -1) {
         return true;
     }
 

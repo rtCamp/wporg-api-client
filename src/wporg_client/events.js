@@ -13,24 +13,25 @@ import { doesElementHaveOneOfType } from '../utils/generic_functions';
  *
  * @param {Object}(required) args - List of arguments
  */
-const getEventDetails = async (args) => {
+const getEventDetails = (args) => {
     if (!args) {
         throw new Error('Please pass arguments');
     }
 
-    /** If not a valid object */
+    /** If a valid object */
     if ((args && !isObject(args)) || (args && Array.isArray(args))) {
-        throw new Error("Arguments should be an object and can't be empty!");
+        throw new Error("arguments should be an object and can't be empty!");
     }
 
     for (let arg in args) {
         let argValue = args[arg];
 
-        /** If unsupported argument is passed */
+        /** If argument exists */
         if (!(arg in event_args)) {
-            throw new Error(`Argument ${arg} is not supported`);
+            throw new Error(`argument ${arg} is not supported`);
         }
 
+        /** If type of latitude and longitude is either string or number*/
         if (arg === 'latitude' || arg === 'longitude') {
             if (doesElementHaveOneOfType(argValue, event_args[arg])) {
                 throw new Error(
@@ -38,28 +39,18 @@ const getEventDetails = async (args) => {
                 );
             }
         } else if (typeof argValue != event_args[arg]) {
-            /** If argument value data type is incorrect */
+            /** If argument value data type is correct */
             throw new Error(
-                `Argument ${arg} should be ${
+                `argument ${arg} should be ${
                     event_args[arg]
                 }, passed ${typeof argValue}`,
             );
         }
     }
 
-    let response;
-
-    try {
-        response = await fetchEventDetails(args);
-        /** The date and end_date fields in the response are in the event's local
-         * timezone, not UTC.
-         * */
-    } catch (error) {
-        const { message } = error || {};
-        throw new Error(message);
-    }
-
-    return response;
+    /** The date and end_date fields in the response are in the event's local
+     * timezone, not UTC. */
+    return fetchEventDetails(args);
 };
 
 export { getEventDetails };

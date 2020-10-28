@@ -7,31 +7,22 @@ import {
     fetchBrowserInfo,
 } from '../wporg_server/';
 
-import { translationTypes } from '../utils/api_types';
+import { TRANSLATION_API_TYPES } from '../utils/api_types';
 
 /** These types are maintained in  constants file  */
 const translationType =
-    translationTypes && Array.isArray(translationTypes) && translationTypes[2];
+    TRANSLATION_API_TYPES &&
+    Array.isArray(TRANSLATION_API_TYPES) &&
+    TRANSLATION_API_TYPES[2];
 
 /**
  * Get wordpress translations
  *
  * @param {String} version(optional) - Plugin version, fallbacks to the latest version of not passed
  */
-const getCoreTranslations = async (version) => {
-    let response;
-
-    try {
-        /** Core is by default in the API so that's why we have passed  null as slug in the
-         * 2nd arg
-         */
-        response = await fetchTranslations(translationType, null, version);
-    } catch (error) {
-        const { message } = error || {};
-        throw new Error(message);
-    }
-
-    return response;
+const getCoreTranslations = (version) => {
+    /** Core is by default in the API so that's why we have passed  null as slug in the 2nd arg */
+    return fetchTranslations(translationType, null, version);
 };
 
 /**
@@ -40,7 +31,7 @@ const getCoreTranslations = async (version) => {
  * @param {String}(optional) version - To fetch versions released after given version
  * @param {String}(optional) locale - Locale
  */
-const getCoreVersionInfo = async (version, locale) => {
+const getCoreVersionInfo = (version, locale) => {
     if (
         (version && typeof version !== 'string') ||
         (locale && typeof locale !== 'string')
@@ -48,16 +39,7 @@ const getCoreVersionInfo = async (version, locale) => {
         throw new Error('version and locale should be in string');
     }
 
-    let response;
-
-    try {
-        response = await fetchCoreVersionInfo(version, locale);
-    } catch (error) {
-        const { message } = error || {};
-        throw new Error(message);
-    }
-
-    return response;
+    return fetchCoreVersionInfo(version, locale);
 };
 
 /**
@@ -66,7 +48,7 @@ const getCoreVersionInfo = async (version, locale) => {
  * @param {String}(optional) version
  * @param {String}(optional) locale
  */
-const getCoreCreditDetails = async (version, locale) => {
+const getCoreCreditDetails = (version, locale) => {
     if (
         (version && typeof version !== 'string') ||
         (locale && typeof locale !== 'string')
@@ -74,16 +56,7 @@ const getCoreCreditDetails = async (version, locale) => {
         throw new Error('version and locale should be in string');
     }
 
-    let response;
-
-    try {
-        response = await fetchCoreCreditDetails(version, locale);
-    } catch (error) {
-        const { message } = error || {};
-        throw new Error(message);
-    }
-
-    return response;
+    return fetchCoreCreditDetails(version, locale);
 };
 
 /**
@@ -94,7 +67,7 @@ const getCoreCreditDetails = async (version, locale) => {
  * @param {String}(required) version
  * @param {String}(optional) locale
  */
-const getCoreChecksums = async (version, locale) => {
+const getCoreChecksums = (version, locale) => {
     if (!version) {
         throw new Error('version is required');
     }
@@ -106,16 +79,7 @@ const getCoreChecksums = async (version, locale) => {
         throw new Error('version and locale should be in string');
     }
 
-    let response;
-
-    try {
-        response = await fetchCoreChecksums(version, locale);
-    } catch (error) {
-        const { message } = error || {};
-        throw new Error(message);
-    }
-
-    return response;
+    return fetchCoreChecksums(version, locale);
 };
 
 /**
@@ -123,21 +87,12 @@ const getCoreChecksums = async (version, locale) => {
  *
  * @param {String} useragent
  */
-const getBrowserInfo = async (useragent) => {
+const getBrowserInfo = (useragent) => {
     if (!useragent || typeof useragent !== 'string') {
         throw new Error('useragent is required and should be string');
     }
 
-    let response;
-
-    try {
-        response = await fetchBrowserInfo(useragent);
-    } catch (error) {
-        const { message } = error || {};
-        throw new Error(message);
-    }
-
-    return response;
+    return fetchBrowserInfo(useragent);
 };
 
 export {

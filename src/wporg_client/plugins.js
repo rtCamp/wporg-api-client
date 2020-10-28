@@ -17,13 +17,21 @@ import {
     query_plugin_filters,
     browse_values,
 } from './utils/arguments';
-import { infoTypes, translationTypes, statsTypes } from '../utils/api_types';
+import {
+    INFO_API_TYPES,
+    TRANSLATION_API_TYPES,
+    STATS_API_TYPES,
+} from '../utils/api_types';
 
 /** These types are maintained in  constants file  */
-const type = infoTypes && Array.isArray(infoTypes) && infoTypes[1];
+const type =
+    INFO_API_TYPES && Array.isArray(INFO_API_TYPES) && INFO_API_TYPES[1];
 const translationType =
-    translationTypes && Array.isArray(translationTypes) && translationTypes[1];
-const statsType = statsTypes ** Array.isArray(statsTypes) && statsTypes[3];
+    TRANSLATION_API_TYPES &&
+    Array.isArray(TRANSLATION_API_TYPES) &&
+    TRANSLATION_API_TYPES[1];
+const statsType =
+    STATS_API_TYPES ** Array.isArray(STATS_API_TYPES) && STATS_API_TYPES[3];
 
 /**
  * Get list of plugins
@@ -31,21 +39,22 @@ const statsType = statsTypes ** Array.isArray(statsTypes) && statsTypes[3];
  * @param {Object} args(optional) - An object of arguments for filter, possible values are listed
  * in utils => arguments => query_plugins_args
  */
-const getPluginsList = async (args = {}) => {
-    /** If not a valid object */
+const getPluginsList = (args = {}) => {
+    /** If a valid object */
     if ((args && !isObject(args)) || (args && Array.isArray(args))) {
-        throw new Error("Arguments should be an object and can't be empty!");
+        throw new Error('arguments should be an object');
     }
 
+    /** Check each argument and it's type */
     for (let arg in args) {
         let argValue = args[arg];
 
-        /** If unsupported argument is passed */
+        /** If argument exists */
         if (!(arg in query_plugins_args)) {
-            throw new Error(`Argument ${arg} is not supported`);
+            throw new Error(`argument ${arg} doesn't exist`);
         }
 
-        /** If tag is neither string not array */
+        /** If tag is string or array of string */
         if (arg === 'tag') {
             if (
                 typeof argValue === 'string' ||
@@ -54,38 +63,29 @@ const getPluginsList = async (args = {}) => {
             ) {
             } else {
                 throw new Error(
-                    'Argument tag should be either string or array of strings',
+                    'argument tag should be either string or array of strings',
                 );
             }
         } else if (typeof argValue != query_plugins_args[arg]) {
-            /** If argument value data type is incorrect */
+            /** If argument value data type is correct */
             throw new Error(
-                `Argument ${arg} should be ${
+                `argument ${arg} should be ${
                     query_plugins_args[arg]
                 }, passed ${typeof argValue}`,
             );
         }
 
-        /** If browse filter have unsupported values passed */
+        /** If browse filter have correct values passed */
         if (arg === 'browse' && browse_values.indexOf(argValue) === -1) {
             throw new Error(
-                `Incorrect value provided for argument ${arg}, possible values are ${browse_values}`,
+                `incorrect value provided for argument ${arg}, possible values are ${browse_values}`,
             );
         }
     }
 
-    let response;
-
     const action = pluginsActions['QUERY_PLUGINS'];
 
-    try {
-        response = await fetchInfo(type, action, args);
-    } catch (error) {
-        const { message } = error || {};
-        throw new Error(message);
-    }
-
-    return response;
+    return fetchInfo(type, action, args);
 };
 
 /**
@@ -99,21 +99,22 @@ const getPluginsList = async (args = {}) => {
  * Use any one value from query_plugin_filters object listed in arguments file,
  * e.g: getPluginsBy('browse', 'popular') to get popular plugins listing
  */
-const getPluginsBy = async (filter_key, filter_value, page, per_page) => {
+const getPluginsBy = (filter_key, filter_value, page, per_page) => {
+    /** If filter key and filter value is passed */
     if (!filter_key || !filter_value) {
-        throw new Error('Filter key and filter value are required!');
+        throw new Error('filter key and filter value are required!');
     }
 
-    /** If unsupported filter is passed */
+    /** If supported filter is passed */
     if (!(filter_key in query_plugin_filters)) {
         throw new Error(
-            `Filter ${filter_key} is not supported, possible options are ${Object.keys(
+            `filter ${filter_key} is not supported, possible options are ${Object.keys(
                 query_plugin_filters,
             )}!`,
         );
     }
 
-    /** If tag filter type is incorrect. */
+    /** If tag filter is string or array of strings */
     if (filter_key === 'tag') {
         if (
             typeof filter_value === 'string' ||
@@ -126,28 +127,26 @@ const getPluginsBy = async (filter_key, filter_value, page, per_page) => {
     } else if (typeof filter_value != query_plugin_filters[filter_key]) {
         /** If argument value data type is incorrect */
         throw new Error(
-            `Filter ${filter_key} should be ${
+            `filter ${filter_key} should be ${
                 query_plugin_filters[filter_key]
             }, passed ${typeof filter_value}`,
         );
     }
 
-    /** If browse filter have unsupported values passed */
+    /** If browse filter have correct values passed */
     if (filter_key === 'browse' && browse_values.indexOf(filter_value) === -1) {
         throw new Error(
-            `Incorrect value provided for filter ${filter_key}, possible values are ${browse_values}`,
+            `incorrect value provided for filter ${filter_key}, possible values are ${browse_values}`,
         );
     }
 
-    /** If page or page number type is incorrect */
+    /** If page and per page type is correct */
     if (
         (page && typeof page !== 'number') ||
         (per_page && typeof per_page !== 'number')
     ) {
-        throw new Error(`page and per_page should be number`);
+        throw new Error(`page and per page should be number`);
     }
-
-    let response;
 
     const action = pluginsActions['QUERY_PLUGINS'];
 
@@ -157,14 +156,7 @@ const getPluginsBy = async (filter_key, filter_value, page, per_page) => {
         per_page,
     };
 
-    try {
-        response = await fetchInfo(type, action, args);
-    } catch (error) {
-        const { message } = error || {};
-        throw new Error(message);
-    }
-
-    return response;
+    return fetchInfo(type, action, args);
 };
 
 /**
@@ -174,13 +166,11 @@ const getPluginsBy = async (filter_key, filter_value, page, per_page) => {
  * @param {Array} fields(optional) -  Not accepting currently as associative arrays are not
  * available in JS
  */
-const getPluginInfo = async (plugin_slug, fields) => {
+const getPluginInfo = (plugin_slug, fields) => {
     /** @todo add support for fields */
     if (!plugin_slug) {
         throw new Error('plugin slug is required');
     }
-
-    let response;
 
     const action = pluginsActions['PLUGIN_INFORMATION'];
 
@@ -188,14 +178,7 @@ const getPluginInfo = async (plugin_slug, fields) => {
         slug: plugin_slug,
     };
 
-    try {
-        response = await fetchInfo(type, action, args);
-    } catch (error) {
-        const { message } = error || {};
-        throw new Error(message);
-    }
-
-    return response;
+    return fetchInfo(type, action, args);
 };
 
 /**
@@ -205,13 +188,11 @@ const getPluginInfo = async (plugin_slug, fields) => {
  *
  * Note: tags_count is not implemented in the api yet
  */
-const getPluginHotTagsList = async (tags_count) => {
+const getPluginHotTagsList = (tags_count) => {
     /** If tags count is of incorrect type */
     if (tags_count && typeof tags_count !== 'number') {
         throw new Error(`${tags_count} should be number`);
     }
-
-    let response;
 
     const action = pluginsActions['HOT_TAGS'];
 
@@ -219,14 +200,7 @@ const getPluginHotTagsList = async (tags_count) => {
         number: tags_count,
     };
 
-    try {
-        response = await fetchInfo(type, action, args);
-    } catch (error) {
-        const { message } = error || {};
-        throw new Error(message);
-    }
-
-    return response;
+    return fetchInfo(type, action, args);
 };
 
 /**
@@ -235,37 +209,19 @@ const getPluginHotTagsList = async (tags_count) => {
  * @param {String} slug(required) - Plugin slug
  * @param {String} version(optional) - Plugin version, fallbacks to the latest version of not passed
  */
-const getPluginTranslations = async (slug, version) => {
+const getPluginTranslations = (slug, version) => {
     if (!slug) {
-        throw new Error('Slug is required');
+        throw new Error('slug is required');
     }
 
-    let response;
-
-    try {
-        response = await fetchTranslations(translationType, slug, version);
-    } catch (error) {
-        const { message } = error || {};
-        throw new Error(message);
-    }
-
-    return response;
+    return fetchTranslations(translationType, slug, version);
 };
 
 /**
  * Get plugin stats
  */
-const getPluginStats = async () => {
-    let response;
-
-    try {
-        response = await getStats(statsType);
-    } catch (error) {
-        const { message } = error || {};
-        throw new Error(message);
-    }
-
-    return response;
+const getPluginStats = () => {
+    return getStats(statsType);
 };
 
 /**
@@ -274,25 +230,16 @@ const getPluginStats = async () => {
  * @param {String}(required) slug - plugins slug
  * @param {String}(optional) limit - Downloads in last {limit} days
  */
-const getPluginDownloads = async (slug, limit) => {
+const getPluginDownloads = (slug, limit) => {
     if (!slug) {
-        throw new Error('Slug is required');
+        throw new Error('slug is required');
     }
 
     if (limit && typeof limit !== 'number') {
-        throw new Error('Limit should be of type number');
+        throw new Error('limit should be of type number');
     }
 
-    let response;
-
-    try {
-        response = await fetchPluginDownloads(slug, limit);
-    } catch (error) {
-        const { message } = error || {};
-        throw new Error(message);
-    }
-
-    return response;
+    return fetchPluginDownloads(slug, limit);
 };
 
 export {

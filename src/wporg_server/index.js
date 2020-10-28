@@ -18,7 +18,7 @@ import {
     POPULAR_IMPORT_PLUGINS,
 } from '../utils/apis';
 import { DEFAULT_API_VERSIONS } from '../utils/versions';
-import { infoTypes } from '../utils/api_types';
+import { INFO_API_TYPES } from '../utils/api_types';
 
 /**
  * Fetch themes or plugin info
@@ -55,6 +55,7 @@ const fetchInfo = async (type, action, args, version) => {
      * in url
      * */
     let tagsParam = '';
+
     /** We are checking if tag exists in args object and it is an array, if not an array
      * then will be handled like normal arg in for loop
      * */
@@ -73,7 +74,7 @@ const fetchInfo = async (type, action, args, version) => {
                 version = DEFAULT_API_VERSIONS[type];
             } else {
                 throw new Error(
-                    `Type ${type} is incorrect, available types are ${infoTypes}`,
+                    `Type ${type} is incorrect, available types are ${INFO_API_TYPES}`,
                 );
             }
         }
