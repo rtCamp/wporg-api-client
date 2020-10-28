@@ -27,6 +27,7 @@ const DEFAULT_API_VERSIONS = {
     'version-check': '1.7',
     credits: '1.1',
     checksums: '1.0',
+    events: '1.0',
 };
 
 export { DEFAULT_API_VERSIONS };

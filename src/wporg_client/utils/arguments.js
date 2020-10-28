@@ -51,6 +51,20 @@ const query_plugin_filters = {
 };
 
 /**
+ * Events
+ */
+const event_args = {
+    number: 'number',
+    location: 'string',
+    locale: 'string',
+    timezone: 'string',
+    latitude: ['number , string'],
+    longitude: ['number , string'],
+    ip: 'string',
+    country: 'string',
+};
+
+/**
  * Common
  */
 
@@ -62,5 +76,6 @@ export {
     query_themes_filters,
     query_plugins_args,
     query_plugin_filters,
+    event_args,
     browse_values,
 };

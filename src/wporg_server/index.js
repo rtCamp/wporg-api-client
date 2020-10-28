@@ -11,6 +11,7 @@ import {
     CORE_VERSION_CHECK_API,
     CORE_CREDITS_API,
     CORE_CHECKSUMS_API,
+    EVENTS_API,
 } from '../utils/apis';
 import { DEFAULT_API_VERSIONS } from '../utils/versions';
 import { infoTypes } from '../utils/api_types';
@@ -310,6 +311,50 @@ const fetchCoreChecksums = async (version, locale) => {
     return response;
 };
 
+/**
+ * Upcoming WordCamps and meetup events, filterable by location.
+ *
+ * @param {Object}(required) args - List of arguments
+ */
+const fetchEventDetails = async (args) => {
+    let response = {},
+        params = {};
+
+    /**  Add params from args object */
+    for (let arg in args) {
+        let value = args[arg];
+
+        params = {
+            ...params,
+            [arg]: value,
+        };
+    }
+
+    try {
+        const apiVersion = DEFAULT_API_VERSIONS['events'];
+        const url = `${EVENTS_API}/${apiVersion}`;
+
+        response = await axios({
+            url,
+            params: { ...params },
+        });
+
+        /** Throw error if api returns error object
+         * Checked for truthy value of error because unlike other cases here we are
+         * getting and error key with 'null'
+         */
+        const responseData = _get(response, 'data', {}) || {};
+        if ('error' in responseData && responseData['error']) {
+            throw new Error(_get(response, 'data.error', {}) || {});
+        }
+    } catch (error) {
+        const { message } = error || {};
+        throw new Error(message);
+    }
+
+    return response;
+};
+
 export {
     fetchInfo,
     fetchTranslations,
@@ -318,4 +363,5 @@ export {
     fetchCoreVersionInfo,
     fetchCoreCreditDetails,
     fetchCoreChecksums,
+    fetchEventDetails,
 };

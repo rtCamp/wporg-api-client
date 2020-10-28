@@ -26,7 +26,7 @@ const translationType =
  * in utils => themes_info => arguments => query_themes_args
  */
 const getThemesList = async (args = {}) => {
-    /** If not an valid object */
+    /** If not a valid object */
     if ((args && !isObject(args)) || (args && Array.isArray(args))) {
         throw new Error("Arguments should be an object and can't be empty!");
     }

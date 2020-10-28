@@ -32,7 +32,7 @@ const statsType = statsTypes ** Array.isArray(statsTypes) && statsTypes[3];
  * in utils => arguments => query_plugins_args
  */
 const getPluginsList = async (args = {}) => {
-    /** If not an valid object */
+    /** If not a valid object */
     if ((args && !isObject(args)) || (args && Array.isArray(args))) {
         throw new Error("Arguments should be an object and can't be empty!");
     }
