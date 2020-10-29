@@ -1,162 +1,105 @@
-/** External dependencies */
-import isObject from 'lodash/isObject';
-
 /**  Internal dependencies */
-import {
-    fetchInfo,
-    fetchTranslations,
-    fetchPluginDownloads,
-} from '../wporg_server/';
-import { getStats } from './stats';
+import { fetchInfo, fetchTranslations, fetchStats, fetchPluginDownloads } from '../wporg_server/';
 
 /** Utilities */
-import { hasCorrectElementTypesInArray } from '../utils/generic_functions';
+import { INFO_API, TRANSLATIONS_API, STATS_API, PLUGIN_DOWNLOADS_API } from '../utils/apis';
 import { pluginsActions } from './utils/actions';
+import { INFO_API_TYPES, TRANSLATION_API_TYPES } from '../utils/api_types';
+import { API_VERSIONS, DEFAULT_API_VERSIONS } from '../utils/versions';
 import {
-    query_plugins_args,
-    query_plugin_filters,
-    browse_values,
-} from './utils/arguments';
-import {
-    INFO_API_TYPES,
-    TRANSLATION_API_TYPES,
-    STATS_API_TYPES,
-} from '../utils/api_types';
+    isInfoListParamsValid,
+    isFilterInfoListParamsValid,
+    createParamsObj,
+    concatenateTags,
+} from './utils/plugins_themes_common_methods';
+import { isValidVersion } from '../utils/generic_functions';
 
 /** These types are maintained in  constants file  */
-const type =
-    INFO_API_TYPES && Array.isArray(INFO_API_TYPES) && INFO_API_TYPES[1];
-const translationType =
-    TRANSLATION_API_TYPES &&
-    Array.isArray(TRANSLATION_API_TYPES) &&
-    TRANSLATION_API_TYPES[1];
-const statsType =
-    STATS_API_TYPES ** Array.isArray(STATS_API_TYPES) && STATS_API_TYPES[3];
+const infoType = Array.isArray(INFO_API_TYPES) && INFO_API_TYPES[1];
+
+const translationType = Array.isArray(TRANSLATION_API_TYPES) && TRANSLATION_API_TYPES[1];
 
 /**
  * Get list of plugins
  *
- * @param {Object} args(optional) - An object of arguments for filter, possible values are listed
- * in utils => arguments => query_plugins_args
+ * @param {Object} args - An object of arguments for filter, possible values are listed
+ * in utils => arguments => query_plugins_params
+ * @param {String} api_version
  */
-const getPluginsList = (args = {}) => {
-    /** If a valid object */
-    if ((args && !isObject(args)) || (args && Array.isArray(args))) {
-        throw new Error('arguments should be an object');
+const getPluginsList = (args = {}, api_version) => {
+    const { isValid, errors } = isInfoListParamsValid(args, infoType);
+
+    if (!isValid) {
+        throw new Error(errors);
     }
 
-    /** Check each argument and it's type */
-    for (let arg in args) {
-        let argValue = args[arg];
+    const params = {
+        action: pluginsActions['QUERY_PLUGINS'],
+        ...createParamsObj(args),
+    };
 
-        /** If argument exists */
-        if (!(arg in query_plugins_args)) {
-            throw new Error(`argument ${arg} doesn't exist`);
-        }
+    /** We're concatenating tag param in url when tag is an array of strings because
+     * 	params object can not have two properties with the same key
+     * */
+    const concatenatedTags = concatenateTags(args);
 
-        /** If tag is string or array of string */
-        if (arg === 'tag') {
-            if (
-                typeof argValue === 'string' ||
-                (Array.isArray(argValue) &&
-                    hasCorrectElementTypesInArray(argValue, 'string'))
-            ) {
-            } else {
-                throw new Error(
-                    'argument tag should be either string or array of strings',
-                );
-            }
-        } else if (typeof argValue != query_plugins_args[arg]) {
-            /** If argument value data type is correct */
-            throw new Error(
-                `argument ${arg} should be ${
-                    query_plugins_args[arg]
-                }, passed ${typeof argValue}`,
-            );
-        }
-
-        /** If browse filter have correct values passed */
-        if (arg === 'browse' && browse_values.indexOf(argValue) === -1) {
-            throw new Error(
-                `incorrect value provided for argument ${arg}, possible values are ${browse_values}`,
-            );
+    /** Use default version if not provided */
+    if (!isValidVersion(api_version, API_VERSIONS['info_api'])) {
+        if (infoType in DEFAULT_API_VERSIONS) {
+            api_version = DEFAULT_API_VERSIONS[infoType];
+        } else {
+            throw new Error(`type ${infoType} is incorrect, available types are ${INFO_API_TYPES}`);
         }
     }
 
-    const action = pluginsActions['QUERY_PLUGINS'];
+    const url = `/${infoType}${INFO_API}/${api_version}?${concatenatedTags}`;
 
-    return fetchInfo(type, action, args);
+    return fetchInfo(url, params);
 };
 
 /**
- * Get plugins by filters
+ * Get filtered plugins list
  *
- * @param {String} filter_key(required)
- * @param {String} filter_value(required)
- * @param {Number} page(optional) - Page number
- * @param {Number} per_page(optional) - Plugins per page
+ * @param {String} filter_key*
+ * @param {String} filter_value*
+ * @param {Number} page - Page number
+ * @param {Number} per_page - Plugins per page
+ * @param {String} api_version
  *
- * Use any one value from query_plugin_filters object listed in arguments file,
+ * Use any one value from query_plugin_filter_params object listed in arguments file,
  * e.g: getPluginsBy('browse', 'popular') to get popular plugins listing
  */
-const getPluginsBy = (filter_key, filter_value, page, per_page) => {
-    /** If filter key and filter value is passed */
-    if (!filter_key || !filter_value) {
-        throw new Error('filter key and filter value are required!');
+const filterPluginsBy = (filter_key, filter_value, page, per_page, api_version) => {
+    const { isValid, errors } = isFilterInfoListParamsValid(filter_key, filter_value, page, per_page, infoType);
+
+    if (!isValid) {
+        throw new Error(errors);
     }
 
-    /** If supported filter is passed */
-    if (!(filter_key in query_plugin_filters)) {
-        throw new Error(
-            `filter ${filter_key} is not supported, possible options are ${Object.keys(
-                query_plugin_filters,
-            )}!`,
-        );
-    }
-
-    /** If tag filter is string or array of strings */
-    if (filter_key === 'tag') {
-        if (
-            typeof filter_value === 'string' ||
-            (Array.isArray(filter_value) &&
-                hasCorrectElementTypesInArray(filter_value, 'string'))
-        ) {
-        } else {
-            throw new Error('Tag should be either string or array of strings!');
-        }
-    } else if (typeof filter_value != query_plugin_filters[filter_key]) {
-        /** If argument value data type is incorrect */
-        throw new Error(
-            `filter ${filter_key} should be ${
-                query_plugin_filters[filter_key]
-            }, passed ${typeof filter_value}`,
-        );
-    }
-
-    /** If browse filter have correct values passed */
-    if (filter_key === 'browse' && browse_values.indexOf(filter_value) === -1) {
-        throw new Error(
-            `incorrect value provided for filter ${filter_key}, possible values are ${browse_values}`,
-        );
-    }
-
-    /** If page and per page type is correct */
-    if (
-        (page && typeof page !== 'number') ||
-        (per_page && typeof per_page !== 'number')
-    ) {
-        throw new Error(`page and per page should be number`);
-    }
-
-    const action = pluginsActions['QUERY_PLUGINS'];
-
-    const args = {
+    const params = {
+        action: pluginsActions['QUERY_PLUGINS'],
         [filter_key]: filter_value,
         page,
         per_page,
     };
 
-    return fetchInfo(type, action, args);
+    /** We're concatenating tag param in url when tag is an array of strings because
+     * 	params object can not have two properties with the same key
+     * */
+    const concatenatedTags = concatenateTags(args);
+
+    /** Use default version if not provided */
+    if (!isValidVersion(api_version, API_VERSIONS['info_api'])) {
+        if (infoType in DEFAULT_API_VERSIONS) {
+            api_version = DEFAULT_API_VERSIONS[infoType];
+        } else {
+            throw new Error(`type ${infoType} is incorrect, available types are ${INFO_API_TYPES}`);
+        }
+    }
+
+    const url = `/${infoType}${INFO_API}/${api_version}?${concatenatedTags}`;
+
+    return fetchInfo(url, params);
 };
 
 /**
@@ -165,42 +108,46 @@ const getPluginsBy = (filter_key, filter_value, page, per_page) => {
  * @param {String} plugin_slug(required)
  * @param {Array} fields(optional) -  Not accepting currently as associative arrays are not
  * available in JS
+ * @param {String} api_version
  */
-const getPluginInfo = (plugin_slug, fields) => {
+const getPluginInfo = (plugin_slug, fields, api_version) => {
     /** @todo add support for fields */
     if (!plugin_slug) {
         throw new Error('plugin slug is required');
     }
 
-    const action = pluginsActions['PLUGIN_INFORMATION'];
-
-    const args = {
+    const params = {
+        action: pluginsActions['PLUGIN_INFORMATION'],
         slug: plugin_slug,
     };
 
-    return fetchInfo(type, action, args);
+    const url = `/${infoType}${INFO_API}/${api_version}`;
+
+    return fetchInfo(url, params);
 };
 
 /**
  * Get list of most popular plugin tags
  *
  * @param {Number} tags_count(optional) - The number of tags to return
+ * @param {String} api_version
  *
  * Note: tags_count is not implemented in the api yet
  */
-const getPluginHotTagsList = (tags_count) => {
+const getPluginHotTagsList = (tags_count, api_version) => {
     /** If tags count is of incorrect type */
     if (tags_count && typeof tags_count !== 'number') {
         throw new Error(`${tags_count} should be number`);
     }
 
-    const action = pluginsActions['HOT_TAGS'];
-
-    const args = {
+    const params = {
+        action: pluginsActions['HOT_TAGS'],
         number: tags_count,
     };
 
-    return fetchInfo(type, action, args);
+    const url = `/${infoType}${INFO_API}/${api_version}`;
+
+    return fetchInfo(url, params);
 };
 
 /**
@@ -208,46 +155,84 @@ const getPluginHotTagsList = (tags_count) => {
  *
  * @param {String} slug(required) - Plugin slug
  * @param {String} version(optional) - Plugin version, fallbacks to the latest version of not passed
+ * @param {String}(optional) api_version
  */
-const getPluginTranslations = (slug, version) => {
+const getPluginTranslations = (slug, version, api_version) => {
     if (!slug) {
         throw new Error('slug is required');
     }
 
-    return fetchTranslations(translationType, slug, version);
+    const params = {
+        slug,
+        version,
+    };
+
+    if (!isValidVersion(api_version, API_VERSIONS['translation_api'])) {
+        api_version = DEFAULT_API_VERSIONS['translations'];
+    }
+
+    const url = `${TRANSLATIONS_API}/${translationType}/${api_version}`;
+
+    return fetchTranslations(url, params);
 };
 
 /**
- * Get plugin stats
- */
-const getPluginStats = () => {
-    return getStats(statsType);
-};
-
-/**
- * Fetch plugin number of downloads
+ * Fetch plugin downloads count
  *
  * @param {String}(required) slug - plugins slug
  * @param {String}(optional) limit - Downloads in last {limit} days
+ * @param {String}(optional) api_version
  */
-const getPluginDownloads = (slug, limit) => {
+const getPluginDownloads = (slug, limit, api_version) => {
     if (!slug) {
         throw new Error('slug is required');
     }
 
     if (limit && typeof limit !== 'number') {
-        throw new Error('limit should be of type number');
+        throw new Error('limit should be number');
     }
 
-    return fetchPluginDownloads(slug, limit);
+    const params = {
+        slug,
+        limit,
+    };
+
+    if (!isValidVersion(api_version, API_VERSIONS['stats_api'])) {
+        api_version = DEFAULT_API_VERSIONS['stats'];
+    }
+
+    const url = `${STATS_API}/plugin/${api_version}${PLUGIN_DOWNLOADS_API}`;
+
+    return fetchPluginDownloads(url, params);
+};
+
+/**
+ * Get plugin stats
+ *
+ * @param {String}(required) type - 'wordpress' | 'php' |  'mysql' |  'plugin'
+ * @param {String}(required) slug - Plugin slug
+ * @param {String}(optional) api_version
+ */
+const getPluginStats = (slug, api_version) => {
+    if (!slug) {
+        throw new Error('plugin slug is required');
+    }
+
+    if (!isValidVersion(api_version, API_VERSIONS['stats_api'])) {
+        api_version = DEFAULT_API_VERSIONS['stats'];
+    }
+
+    const url = `${STATS_API}/plugins/${api_version}/${slug}`;
+
+    return fetchStats(url);
 };
 
 export {
     getPluginsList,
-    getPluginsBy,
+    filterPluginsBy,
     getPluginInfo,
     getPluginHotTagsList,
     getPluginTranslations,
-    getPluginStats,
     getPluginDownloads,
+    getPluginStats,
 };

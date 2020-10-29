@@ -3,90 +3,27 @@ import _get from 'lodash/get';
 
 /** Utilities */
 import axios from '../utils/axios_instance';
-import {
-    INFO_API,
-    TRANSLATIONS_API,
-    STATS_API,
-    PLUGIN_DOWNLOADS_API,
-    CORE_VERSION_CHECK_API,
-    CORE_CREDITS_API,
-    CORE_CHECKSUMS_API,
-    EVENTS_API,
-    SECRET_KEY_API,
-    SALT_API,
-    BROWSE_HAPPY_API,
-    POPULAR_IMPORT_PLUGINS_API,
-    STABLE_CHECK_API,
-} from '../utils/apis';
-import { DEFAULT_API_VERSIONS } from '../utils/versions';
-import { INFO_API_TYPES } from '../utils/api_types';
+import { SECRET_KEY_API, SALT_API, CORE_BROWSE_HAPPY_API, CORE_POPULAR_IMPORT_PLUGINS_API } from '../utils/apis';
+import { API_VERSIONS, DEFAULT_API_VERSIONS } from '../utils/versions';
+import { isValidVersion } from '../utils/generic_functions';
 
 /**
- * Fetch themes or plugin info
+ * Fetch themes or plugins info
  *
- * @param {String}(required) type - themes | plugins @todo create handler to check
+ * @param {String}(required) type - themes | plugins
  * @param {String}(required) action
  * @param {Object}(optional) args
- * @param {String}(optional) version - available api versions @todo create handler to check
  */
-const fetchInfo = async (type, action, args, version) => {
-    let response = {},
-        params = {
-            action,
-        };
-
-    /**  Add params from args object */
-    for (let arg in args) {
-        /** Tag is handled separately at line 41 when it is passed as an array  */
-        if (arg === 'tag' && Array.isArray(args[arg])) {
-            continue;
-        }
-
-        let key = `request[${arg}]`;
-        let value = args[arg];
-
-        params = {
-            ...params,
-            [key]: value,
-        };
-    }
-
-    /** Tags needs to be passed in url string because params object can not have two properties
-     * with one key which is the case for tags i.e request[tag], so we are concatenating tag params
-     * in url
-     * */
-    let tagsParam = '';
-
-    /** We are checking if tag exists in args object and it is an array, if not an array
-     * then will be handled like normal arg in for loop
-     * */
-    if (args && 'tag' in args && Array.isArray(args['tag'])) {
-        const tags = args['tag'];
-        tags.forEach((tag) => {
-            const tagString = `&request[tag]=${tag}`;
-            tagsParam += tagString;
-        });
-    }
+const fetchInfo = async (url, params) => {
+    let response = {};
 
     try {
-        /** Use default version if not passed */
-        if (!version) {
-            if (type in DEFAULT_API_VERSIONS) {
-                version = DEFAULT_API_VERSIONS[type];
-            } else {
-                throw new Error(
-                    `Type ${type} is incorrect, available types are ${INFO_API_TYPES}`,
-                );
-            }
-        }
-        const url = `/${type}${INFO_API}/${version}?${tagsParam}`;
-
         response = await axios({
             url,
-            params: { ...params },
+            params,
         });
 
-        /** Throw error if api returns error object */
+        /** Throw error if api contains error object */
         const responseData = _get(response, 'data', {}) || {};
 
         if ('error' in responseData) {
@@ -101,33 +38,229 @@ const fetchInfo = async (type, action, args, version) => {
 };
 
 /**
- * Fetch translations
+ * Fetch available translations
  *
- * @param {String}(required) type - themes | plugins | core @todo create handler to check
+ * @param {String}(required) type - themes | plugins | core
  * @param {String}(optional) slug
  * @param {String}(optional) version - theme, plugin or core version
  */
-const fetchTranslations = async (type, slug, version) => {
-    let response = {},
-        params = {
-            slug,
-            version,
-        };
+const fetchTranslations = async (url, params) => {
+    let response = {};
 
     try {
-        const apiVersion = DEFAULT_API_VERSIONS['translations'];
-        const url = `${TRANSLATIONS_API}/${type}/${apiVersion}`;
+        response = await axios({
+            url,
+            params,
+        });
 
+        /** Throw error if api contains error object */
+        const responseData = _get(response, 'data', {}) || {};
+
+        if ('error' in responseData) {
+            throw new Error(_get(response, 'data.error', {}));
+        }
+    } catch (error) {
+        const { message } = error || {};
+        throw new Error(message);
+    }
+
+    return response;
+};
+
+/**
+ * Fetch wordpress version info
+ *
+ * @param {String}(optional) wp_version - To fetch versions released after given version
+ * @param {String}(optional) locale - Locale
+ */
+const fetchCoreVersionInfo = async (url, params) => {
+    let response = {};
+
+    try {
+        response = await axios({
+            url,
+            params,
+        });
+
+        /** Throw error if api contains error object */
+        const responseData = _get(response, 'data', {}) || {};
+
+        if ('error' in responseData) {
+            throw new Error(_get(response, 'data.error', {}));
+        }
+    } catch (error) {
+        const { message } = error || {};
+        throw new Error(message);
+    }
+
+    return response;
+};
+
+/**
+ * Fetch details of individual contributors in wordpress codebase
+ *
+ * @param {String}(optional) wp_version
+ * @param {String}(optional) locale
+ */
+const fetchCoreCreditDetails = async (url, params) => {
+    /** @todo check wordpress version */
+    let response = {};
+
+    try {
         response = await axios({
             url,
             params: { ...params },
         });
 
-        /** Throw error if api returns error object */
+        /** Throw error if api contains error object */
         const responseData = _get(response, 'data', {}) || {};
 
         if ('error' in responseData) {
-            throw new Error(_get(response, 'data.error', {}));
+            throw new Error(_get(response, 'data.error', {}) || {});
+        }
+    } catch (error) {
+        const { message } = error || {};
+        throw new Error(message);
+    }
+
+    return response;
+};
+
+/**
+ * Returns a JSON encoded array of file MD5 checksums for a given WordPress
+ * release / locale. Although english is the default, it's suggested to pass
+ * it for 100% compatibility with core.
+ *
+ * @param {String}(required) wp_version
+ * @param {String}(optional) locale
+ */
+const fetchCoreChecksums = async (url, params) => {
+    let response = {};
+
+    try {
+        response = await axios({
+            url,
+            params,
+        });
+
+        /** Throw error if api contains error object */
+        const responseData = _get(response, 'data', {}) || {};
+
+        if ('error' in responseData) {
+            throw new Error(_get(response, 'data.error', {}) || {});
+        }
+    } catch (error) {
+        const { message } = error || {};
+        throw new Error(message);
+    }
+
+    return response;
+};
+
+/**
+ * Fetch browser details
+ *
+ * @param {String}(required) useragent
+ */
+const fetchBrowserInfo = async (url, params) => {
+    let response = {};
+
+    try {
+        response = await axios({
+            url,
+            params,
+        });
+    } catch (error) {
+        const { message } = error || {};
+        throw new Error(message);
+    }
+
+    return response;
+};
+
+/**
+ * List of popular import plugins in the WordPress Plugin Directory used by
+ * Tools → Import Screen.
+ *
+ * @param {String} api_version
+ */
+const fetchPopularImportPlugins = async (api_version) => {
+    let response = {};
+
+    try {
+        if (!isValidVersion(api_version, API_VERSIONS['core_popular_import_plugins_api'])) {
+            api_version = DEFAULT_API_VERSIONS['core-importers'];
+        }
+
+        const url = `${CORE_POPULAR_IMPORT_PLUGINS_API}/${api_version}`;
+
+        response = await axios({
+            url,
+        });
+    } catch (error) {
+        const { message } = error || {};
+        throw new Error(message);
+    }
+
+    return response;
+};
+
+/**
+ * Check if a version of WordPress is latest, outdated, or insecure
+ *
+ * @param {String} wp_version - Wordpress version
+ */
+const fetchCoreVersionStability = async (url, wp_version) => {
+    let response = {};
+
+    try {
+        const apiResponse = await axios({
+            url,
+        });
+
+        /** If version is provided, pass that version info */
+        if (wp_version) {
+            const data = _get(apiResponse, 'data', {}) || {};
+
+            if (!(wp_version in data)) {
+                throw new Error(`version ${wp_version} doesn't exist`);
+            }
+
+            response = data[wp_version];
+        } else {
+            /** If version is not provided pass all versions info */
+            response = { ...apiResponse };
+        }
+    } catch (error) {
+        const { message } = error || {};
+        throw new Error(message);
+    }
+
+    return response;
+};
+
+/**
+ * Upcoming WordCamps and meetup events, filterable by location.
+ *
+ * @param {Object}(required) args - List of arguments
+ */
+const fetchEventDetails = async (url, params) => {
+    let response = {};
+
+    try {
+        response = await axios({
+            url,
+            params,
+        });
+
+        /** Throw error if api contains error object
+         * Checked for truthy value of error because unlike other cases here we are
+         * getting an error key with 'null'
+         */
+        const responseData = _get(response, 'data', {}) || {};
+
+        if ('error' in responseData && responseData['error']) {
+            throw new Error(_get(response, 'data.error', {}) || {});
         }
     } catch (error) {
         const { message } = error || {};
@@ -140,22 +273,18 @@ const fetchTranslations = async (type, slug, version) => {
 /**
  * Fetch stats
  *
- * @param {String}(required) type - themes | plugins | core @todo create handler to check
- * @param {String}(optional) slug
- * @param {String}(optional) version - theme, plugin or core version
+ * @param {String}(required) type - themes | plugins | core
+ * @param {String}(required(when type is plugin) | optional) slug - Plugin slug
  */
-const fetchStats = async (type, version) => {
+const fetchStats = async (url) => {
     let response = {};
 
     try {
-        const apiVersion = DEFAULT_API_VERSIONS['stats'];
-        const url = `${STATS_API}/${type}/${apiVersion}`;
-
         response = await axios({
             url,
         });
 
-        /** Throw error if api returns error object */
+        /** Throw error if api contains error object */
         const responseData = _get(response, 'data', {}) || {};
 
         if ('error' in responseData) {
@@ -175,182 +304,20 @@ const fetchStats = async (type, version) => {
  * @param {String}(required) slug - plugins slug
  * @param {String}(optional) limit - No of days
  */
-const fetchPluginDownloads = async (slug, limit, version) => {
-    let response = {},
-        params = {
-            slug,
-            limit,
-        };
+const fetchPluginDownloads = async (url, params) => {
+    let response = {};
 
     try {
-        const apiVersion = DEFAULT_API_VERSIONS['stats'];
-        const url = `${STATS_API}/plugin/${apiVersion}${PLUGIN_DOWNLOADS_API}`;
-        console.log(url, 'url');
         response = await axios({
             url,
-            params: { ...params },
+            params,
         });
 
-        /** Throw error if api returns error object */
-        const responseData = _get(response, 'data', {}) || {};
-        console.log(responseData, 'responseData');
-        if ('error' in responseData) {
-            throw new Error(_get(response, 'data.error', {}));
-        }
-    } catch (error) {
-        const { message } = error || {};
-        throw new Error(message);
-    }
-
-    return response;
-};
-
-/**
- * Fetch wordpress version info
- *
- * @param {String}(optional) wp_version - To fetch versions released after given version
- * @param {String}(optional) locale - Locale
- * @param {String}(api_version) api_version - API version
- */
-const fetchCoreVersionInfo = async (wp_version, locale, api_version) => {
-    let response = {},
-        params = {
-            version,
-            locale,
-        };
-
-    try {
-        const apiVersion = DEFAULT_API_VERSIONS['core-version-check'];
-        const url = `${CORE_VERSION_CHECK_API}/${apiVersion}`;
-
-        response = await axios({
-            url,
-            params: { ...params },
-        });
-
-        /** Throw error if api returns error object */
+        /** Throw error if api contains error object */
         const responseData = _get(response, 'data', {}) || {};
 
         if ('error' in responseData) {
             throw new Error(_get(response, 'data.error', {}));
-        }
-    } catch (error) {
-        const { message } = error || {};
-        throw new Error(message);
-    }
-
-    return response;
-};
-
-/**
- * Fetch details of individual contributors in wordpress codebase
- *
- * @param {String}(optional) version
- * @param {String}(optional) locale
- */
-const fetchCoreCreditDetails = async (version, locale) => {
-    let response = {},
-        params = {
-            version,
-            locale,
-        };
-
-    try {
-        const apiVersion = DEFAULT_API_VERSIONS['credits'];
-        const url = `${CORE_CREDITS_API}/${apiVersion}`;
-
-        response = await axios({
-            url,
-            params: { ...params },
-        });
-
-        /** Throw error if api returns error object */
-        const responseData = _get(response, 'data', {}) || {};
-
-        if ('error' in responseData) {
-            throw new Error(_get(response, 'data.error', {}) || {});
-        }
-    } catch (error) {
-        const { message } = error || {};
-        throw new Error(message);
-    }
-
-    return response;
-};
-
-/**
- * Returns a JSON encoded array of file MD5 checksums for a given WordPress
- * release / locale. Although english is the default, it's suggested to pass
- * it for 100% compatibility with core.
- *
- * @param {String}(required) version
- * @param {String}(optional) locale
- */
-const fetchCoreChecksums = async (version, locale) => {
-    let response = {},
-        params = {
-            version,
-            locale,
-        };
-
-    try {
-        const apiVersion = DEFAULT_API_VERSIONS['checksums'];
-        const url = `${CORE_CHECKSUMS_API}/${apiVersion}`;
-
-        response = await axios({
-            url,
-            params: { ...params },
-        });
-
-        /** Throw error if api returns error object */
-        const responseData = _get(response, 'data', {}) || {};
-
-        if ('error' in responseData) {
-            throw new Error(_get(response, 'data.error', {}) || {});
-        }
-    } catch (error) {
-        const { message } = error || {};
-        throw new Error(message);
-    }
-
-    return response;
-};
-
-/**
- * Upcoming WordCamps and meetup events, filterable by location.
- *
- * @param {Object}(required) args - List of arguments
- */
-const fetchEventDetails = async (args) => {
-    let response = {},
-        params = {};
-
-    /**  Add params from args object */
-    for (let arg in args) {
-        let value = args[arg];
-
-        params = {
-            ...params,
-            [arg]: value,
-        };
-    }
-
-    try {
-        const apiVersion = DEFAULT_API_VERSIONS['events'];
-        const url = `${EVENTS_API}/${apiVersion}`;
-
-        response = await axios({
-            url,
-            params: { ...params },
-        });
-
-        /** Throw error if api returns error object
-         * Checked for truthy value of error because unlike other cases here we are
-         * getting and error key with 'null'
-         */
-        const responseData = _get(response, 'data', {}) || {};
-        if ('error' in responseData && responseData['error']) {
-            throw new Error(_get(response, 'data.error', {}) || {});
         }
     } catch (error) {
         const { message } = error || {};
@@ -362,101 +329,22 @@ const fetchEventDetails = async (args) => {
 
 /**
  * Secret key generator for wp-config.php
- */
-const generateSecretKey = async () => {
-    let response = {};
-
-    try {
-        const apiVersion = DEFAULT_API_VERSIONS['secret-key'];
-        const url = `${SECRET_KEY_API}/${apiVersion}${SALT_API}`;
-        console.log(url, 'url');
-        response = await axios({
-            url,
-        });
-    } catch (error) {
-        const { message } = error || {};
-        throw new Error(message);
-    }
-
-    return response;
-};
-
-/**
- * Fetch browser details
  *
- * @param {String} useragent
+ * @param {String}(optional) api_version
  */
-const fetchBrowserInfo = async (useragent) => {
-    let response = {},
-        params = {
-            useragent,
-        };
-
-    try {
-        const apiVersion = DEFAULT_API_VERSIONS['browse-happy'];
-        const url = `${BROWSE_HAPPY_API}/${apiVersion}`;
-
-        response = await axios({
-            url,
-            params: { ...params },
-        });
-    } catch (error) {
-        const { message } = error || {};
-        throw new Error(message);
-    }
-
-    return response;
-};
-
-/**
- * List of popular import plugins in the WordPress Plugin Directory used by
- * Tools → Import Screen.
- */
-const fetchPopularImportPlugins = async () => {
+const generateSecretKey = async (api_version) => {
     let response = {};
 
     try {
-        const apiVersion = DEFAULT_API_VERSIONS['importers'];
-        const url = `${POPULAR_IMPORT_PLUGINS_API}/${apiVersion}`;
-
-        response = await axios({
-            url,
-        });
-    } catch (error) {
-        const { message } = error || {};
-        throw new Error(message);
-    }
-
-    return response;
-};
-
-/**
- * Check if a version of WordPress is latest, outdated, or insecure
- *
- * @param {String} wp_version - Wordpress version
- */
-const fetchCoreVersionStability = async (wp_version) => {
-    let response = {};
-
-    try {
-        const apiVersion = DEFAULT_API_VERSIONS['stable-check'];
-        const url = `${STABLE_CHECK_API}/${apiVersion}`;
-
-        const apiResponse = await axios({
-            url,
-        });
-
-        if (wp_version) {
-            const data = _get(apiResponse, 'data', {}) || {};
-
-            if (!(wp_version in data)) {
-                throw new Error(`version ${wp_version} doesn't exist`);
-            }
-
-            response = data[wp_version];
-        } else {
-            response = { ...apiResponse };
+        if (!isValidVersion(api_version, API_VERSIONS['secret_key_api'])) {
+            api_version = DEFAULT_API_VERSIONS['secret-key'];
         }
+
+        const url = `${SECRET_KEY_API}/${api_version}${SALT_API}`;
+
+        response = await axios({
+            url,
+        });
     } catch (error) {
         const { message } = error || {};
         throw new Error(message);
@@ -468,14 +356,14 @@ const fetchCoreVersionStability = async (wp_version) => {
 export {
     fetchInfo,
     fetchTranslations,
-    fetchStats,
-    fetchPluginDownloads,
     fetchCoreVersionInfo,
     fetchCoreCreditDetails,
     fetchCoreChecksums,
-    fetchEventDetails,
-    generateSecretKey,
     fetchBrowserInfo,
     fetchPopularImportPlugins,
     fetchCoreVersionStability,
+    fetchEventDetails,
+    fetchStats,
+    fetchPluginDownloads,
+    generateSecretKey,
 };

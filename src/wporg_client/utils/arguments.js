@@ -3,7 +3,7 @@
  */
 
 /** Arguments for query_themes action  */
-const query_themes_args = {
+const query_themes_params = {
     search: 'string',
     tag: ['string', 'array'],
     theme: 'string', //slug of a theme
@@ -16,7 +16,7 @@ const query_themes_args = {
 
 /** Same as above but have removed page and page_no, as in case of filters they are coming as args
  * not in filters (in method getThemesBy()) */
-const query_themes_filters = {
+const query_themes_filter_params = {
     search: 'string',
     tag: ['string', 'array'],
     theme: 'string', //slug of a theme
@@ -30,7 +30,7 @@ const query_themes_filters = {
  */
 
 /** Arguments for query_plugins action  */
-const query_plugins_args = {
+const query_plugins_params = {
     search: 'string',
     tag: ['string', 'array'],
     author: 'string',
@@ -42,7 +42,7 @@ const query_plugins_args = {
 
 /** Same as above but have removed page and page_no, as in case of filters they are coming as args
  * not in filters (in method getThemesBy()) */
-const query_plugin_filters = {
+const query_plugin_filter_params = {
     search: 'string',
     tag: ['string', 'array'],
     author: 'string',
@@ -53,7 +53,7 @@ const query_plugin_filters = {
 /**
  * Events
  */
-const event_args = {
+const event_params = {
     number: 'number',
     location: 'string',
     locale: 'string',
@@ -72,10 +72,10 @@ const event_args = {
 const browse_values = ['popular', 'featured', 'updated', 'new'];
 
 export {
-    query_themes_args,
-    query_themes_filters,
-    query_plugins_args,
-    query_plugin_filters,
-    event_args,
+    query_themes_params,
+    query_themes_filter_params,
+    query_plugins_params,
+    query_plugin_filter_params,
+    event_params,
     browse_values,
 };

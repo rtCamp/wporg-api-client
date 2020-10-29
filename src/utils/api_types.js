@@ -10,6 +10,7 @@ const INFO_API_TYPES = ['themes', 'plugins'];
 const TRANSLATION_API_TYPES = ['themes', 'plugins', 'core'];
 
 /** Types available for stats api, for eg: /stats/wordpress */
-const STATS_API_TYPES = ['wordpress', 'php', 'mysql', 'plugin'];
+/** plugins is not added because it is passed directly in the getPluginStats method */
+const STATS_API_TYPES = ['wordpress', 'php', 'mysql'];
 
 export { INFO_API_TYPES, TRANSLATION_API_TYPES, STATS_API_TYPES };

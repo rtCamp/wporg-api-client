@@ -21,13 +21,13 @@ const hasCorrectElementTypesInArray = (array, type) => {
 };
 
 /**
- * Checks if the element type is one given type from type_array
+ * Checks if the type of element is one of type in type_array or now
  *
  * @param {Any}(required) element
  * @param {Array}(required) type_array
  *
- * @returns {Boolean} - Returns true if element type matches with any one
- * type from type_array
+ * @returns {Boolean} - Returns true if element type matches with any one of
+ * type in type_array
  */
 const doesElementHaveOneOfType = (element, type_array) => {
     if (!element || !type_array) {
@@ -40,7 +40,7 @@ const doesElementHaveOneOfType = (element, type_array) => {
 
     const elementType = typeof element;
 
-    /** If type is an array because typeof array is object */
+    /** Handle array types differently because type of array is object in JS */
     if (type_array.indexOf('array') !== -1) {
         type_array.forEach((type) => {
             if (type === 'array' && Array.isArray(element)) {
@@ -56,4 +56,32 @@ const doesElementHaveOneOfType = (element, type_array) => {
     return false;
 };
 
-export { hasCorrectElementTypesInArray, doesElementHaveOneOfType };
+/**
+ * Checks if the version is valid
+ *
+ * @param {String} version
+ * @param {Array} versions_array
+ *
+ * @returns {Boolean} - true if an array is valid
+ *
+ */
+const isValidVersion = (version, versions_array) => {
+    if (!version) {
+        throw new Error('version is required');
+    }
+
+    if (!versions_array || Array.isArray(versions_array)) {
+        throw new Array('version array is required and should be array');
+    }
+    if (versions_array.indexOf(version) !== -1) {
+        return true;
+    }
+
+    return false;
+};
+
+export {
+    hasCorrectElementTypesInArray,
+    doesElementHaveOneOfType,
+    isValidVersion,
+};

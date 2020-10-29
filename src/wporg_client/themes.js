@@ -1,81 +1,61 @@
-/** External dependencies */
-import isObject from 'lodash/isObject';
-
 /**  Internal dependencies */
 import { fetchInfo, fetchTranslations } from '../wporg_server/';
 
 /** Utilities */
-import { hasCorrectElementTypesInArray } from '../utils/generic_functions';
 import { themesActions } from './utils/actions';
-import {
-    query_themes_args,
-    query_themes_filters,
-    browse_values,
-} from './utils/arguments';
+import { INFO_API, TRANSLATIONS_API } from '../utils/apis';
 import { INFO_API_TYPES, TRANSLATION_API_TYPES } from '../utils/api_types';
+import { API_VERSIONS, DEFAULT_API_VERSIONS } from '../utils/versions';
+import { isInfoListParamsValid, isFilterInfoListParamsValid } from './utils/plugins_themes_common_methods';
+import {
+    isInfoListParamsValid,
+    isFilterInfoListParamsValid,
+    createParamsObj,
+    concatenateTags,
+} from './utils/plugins_themes_common_methods';
+import { isValidVersion } from '../utils/generic_functions';
 
 /** These types are maintained in  constants file  */
-const infoType =
-    INFO_API_TYPES && Array.isArray(INFO_API_TYPES) && INFO_API_TYPES[0];
+const infoType = INFO_API_TYPES && Array.isArray(INFO_API_TYPES) && INFO_API_TYPES[0];
 
-const translationType =
-    TRANSLATION_API_TYPES &&
-    Array.isArray(TRANSLATION_API_TYPES) &&
-    TRANSLATION_API_TYPES[0];
+const translationType = TRANSLATION_API_TYPES && Array.isArray(TRANSLATION_API_TYPES) && TRANSLATION_API_TYPES[0];
 
 /**
  * Get list of themes
  *
- * @param {Object} args(optional) - An object of arguments for filter, possible values are listed
- * in utils => themes_info => arguments => query_themes_args
+ * @param {Object} args(optional) - An object of arguments to filter, possible values are
+ * listed in utils => themes_info => arguments => query_themes_params
+ * @param {String} api_version
  */
-const getThemesList = (args = {}) => {
-    /** If a valid object */
-    if ((args && !isObject(args)) || (args && Array.isArray(args))) {
-        throw new Error('arguments should be an object');
+const getThemesList = (args = {}, api_version) => {
+    const { isValid, errors } = isInfoListParamsValid(args, infoType);
+
+    if (!isValid) {
+        throw new Error(errors);
     }
 
-    /** Check each argument and it's type */
-    for (let arg in args) {
-        let argValue = args[arg];
+    const params = {
+        action: pluginsActions['QUERY_THEMES'],
+        ...createParamsObj(args),
+    };
 
-        /** If argument exists */
-        if (!(arg in query_themes_args)) {
-            throw new Error(`argument ${arg} doesn't exist`);
-        }
+    /** We're concatenating tag param in url when tag is an array of strings because
+     * 	params object can not have two properties with the same key
+     * */
+    const concatenatedTags = concatenateTags(args);
 
-        /** If tag is string or array of string */
-        if (arg === 'tag') {
-            if (
-                typeof argValue === 'string' ||
-                (Array.isArray(argValue) &&
-                    hasCorrectElementTypesInArray(argValue, 'string'))
-            ) {
-            } else {
-                throw new Error(
-                    'argument tag should be either string or array of strings',
-                );
-            }
-        } else if (typeof argValue != query_themes_args[arg]) {
-            /** If type of argument value is correct */
-            throw new Error(
-                `argument ${arg} should be ${
-                    query_themes_args[arg]
-                }, passed ${typeof argValue}`,
-            );
-        }
-
-        /** If browse filter have correct values passed */
-        if (arg === 'browse' && browse_values.indexOf(argValue) === -1) {
-            throw new Error(
-                `incorrect value provided for argument ${arg}, possible values are ${browse_values}`,
-            );
+    /** Use default version if not provided */
+    if (!isValidVersion(api_version, API_VERSIONS['info_api'])) {
+        if (infoType in DEFAULT_API_VERSIONS) {
+            api_version = DEFAULT_API_VERSIONS[infoType];
+        } else {
+            throw new Error(`type ${infoType} is incorrect, available types are ${INFO_API_TYPES}`);
         }
     }
 
-    const action = themesActions['QUERY_THEMES'];
+    const url = `/${infoType}${INFO_API}/${api_version}?${concatenatedTags}`;
 
-    return fetchInfo(infoType, action, args);
+    return fetchInfo(url, params, api_version);
 };
 
 /**
@@ -85,68 +65,42 @@ const getThemesList = (args = {}) => {
  * @param {String} filter_value(required)
  * @param {Number} page(optional) - Page number
  * @param {Number} per_page(optional) - Themes per page
+ * @param {String} api_version
  *
- * Use any one value from query_themes_filters object listed in arguments file,
- * e.g: getThemesBy('browse', 'popular') to get popular themes listing
+ * Use any one value from query_themes_filter_params object listed in arguments file,
+ * e.g: filterThemesBy('browse', 'popular') to get popular themes listing
  */
-const getThemesBy = (filter_key, filter_value, page, per_page) => {
-    /** If filter key and filter value is passed */
-    if (!filter_key || !filter_value) {
-        throw new Error('filter key and filter value are required!');
+const filterThemesBy = (filter_key, filter_value, page, per_page, api_version) => {
+    const { isValid, errors } = isFilterInfoListParamsValid(filter_key, filter_value, page, per_page, infoType);
+
+    if (!isValid) {
+        throw new Error(errors);
     }
 
-    /** If supported filter is passed */
-    if (!(filter_key in query_themes_filters)) {
-        throw new Error(
-            `filter ${filter_key} is not supported, possible options are ${Object.keys(
-                query_themes_filters,
-            )}!`,
-        );
-    }
-
-    /** If tag filter is string or array of strings */
-    if (filter_key === 'tag') {
-        if (
-            typeof filter_value === 'string' ||
-            (Array.isArray(filter_value) &&
-                hasCorrectElementTypesInArray(filter_value, 'string'))
-        ) {
-        } else {
-            throw new Error('gag should be either string or array of strings!');
-        }
-    } else if (typeof filter_value != query_themes_filters[filter_key]) {
-        /** If argument value data type is incorrect */
-        throw new Error(
-            `filter ${filter_key} should be ${
-                query_themes_filters[filter_key]
-            }, passed ${typeof filter_value}`,
-        );
-    }
-
-    /** If browse filter have correct values passed */
-    if (filter_key === 'browse' && browse_values.indexOf(filter_value) === -1) {
-        throw new Error(
-            `incorrect value provided for filter ${filter_key}, possible values are ${browse_values}`,
-        );
-    }
-
-    /** If page and per page type is correct */
-    if (
-        (page && typeof page !== 'number') ||
-        (per_page && typeof per_page !== 'number')
-    ) {
-        throw new Error(`page and per page should be number`);
-    }
-
-    const action = themesActions['QUERY_THEMES'];
-
-    const args = {
+    const params = {
+        action: pluginsActions['QUERY_THEMES'],
         [filter_key]: filter_value,
         page,
         per_page,
     };
 
-    return fetchInfo(infoType, action, args);
+    /** We're concatenating tag param in url when tag is an array of strings because
+     * 	params object can not have two properties with the same key
+     * */
+    const concatenatedTags = concatenateTags(args);
+
+    /** Use default version if not provided */
+    if (!isValidVersion(api_version, API_VERSIONS['info_api'])) {
+        if (infoType in DEFAULT_API_VERSIONS) {
+            api_version = DEFAULT_API_VERSIONS[infoType];
+        } else {
+            throw new Error(`type ${infoType} is incorrect, available types are ${INFO_API_TYPES}`);
+        }
+    }
+
+    const url = `/${infoType}${INFO_API}/${api_version}?${concatenatedTags}`;
+
+    return fetchInfo(url, params);
 };
 
 /**
@@ -155,26 +109,30 @@ const getThemesBy = (filter_key, filter_value, page, per_page) => {
  * @param {String} theme_slug(required)
  * @param {Array} fields(optional) -  Not accepting currently as associative arrays are not
  * available in JS
+ * @param {String} api_version
  */
-const getThemeInfo = (theme_slug, fields) => {
+const getThemeInfo = (theme_slug, fields, api_version) => {
     /** @todo add support for fields */
     if (!theme_slug) {
         throw new Error('theme slug is required');
     }
 
-    const action = themesActions['THEME_INFORMATION'];
-
-    const args = {
+    const params = {
+        action: pluginsActions['THEME_INFORMATION'],
         slug: theme_slug,
     };
 
-    return fetchInfo(infoType, action, args);
+    const url = `/${infoType}${INFO_API}/${api_version}`;
+
+    return fetchInfo(url, params);
 };
 
 /**
  * Get list of valid theme tags
+ *
+ * @param {String} api_version
  */
-const getThemeTagsList = () => {
+const getThemeHotTagsList = (api_version) => {
     const action = themesActions['FEATURE_LIST'];
 
     return fetchInfo(infoType, action);
@@ -184,20 +142,22 @@ const getThemeTagsList = () => {
  * Get list of most popular theme tags
  *
  * @param {Number} tags_count(optional) - The number of tags to return
+ * @param {String} api_version
  */
-const getThemeHotTagsList = (tags_count) => {
+const getThemeHotTagsList = (tags_count, api_version) => {
     /** If tags count is of correct type */
     if (tags_count && typeof tags_count !== 'number') {
         throw new Error('tags count should be number');
     }
 
-    const action = themesActions['HOT_TAGS'];
-
-    const args = {
+    const params = {
+        action: pluginsActions['HOT_TAGS'],
         number: tags_count,
     };
 
-    return fetchInfo(infoType, action, args);
+    const url = `/${infoType}${INFO_API}/${api_version}`;
+
+    return fetchInfo(url, params);
 };
 
 /**
@@ -205,21 +165,26 @@ const getThemeHotTagsList = (tags_count) => {
  *
  * @param {String} slug(required) - Theme slug
  * @param {String} version(optional) - Theme version, fallbacks to the latest version of not passed
+ * @param {String} api_version
  */
-const getThemeTranslations = (slug, version) => {
+const getThemeTranslations = (slug, version, api_version) => {
     /** If slug is provided */
     if (!slug) {
         throw new Error('slug is required');
     }
 
-    return fetchTranslations(translationType, slug, version);
+    const params = {
+        slug,
+        version,
+    };
+
+    if (!isValidVersion(api_version, API_VERSIONS['translation_api'])) {
+        api_version = DEFAULT_API_VERSIONS['translations'];
+    }
+
+    const url = `${TRANSLATIONS_API}/${translationType}/${api_version}`;
+
+    return fetchTranslations(url, params);
 };
 
-export {
-    getThemesList,
-    getThemesBy,
-    getThemeInfo,
-    getThemeTagsList,
-    getThemeHotTagsList,
-    getThemeTranslations,
-};
+export { getThemesList, filterThemesBy, getThemeInfo, getThemeHotTagsList, getThemeHotTagsList, getThemeTranslations };
