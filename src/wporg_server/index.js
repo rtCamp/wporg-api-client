@@ -15,7 +15,8 @@ import {
     SECRET_KEY_API,
     SALT_API,
     BROWSE_HAPPY_API,
-    POPULAR_IMPORT_PLUGINS,
+    POPULAR_IMPORT_PLUGINS_API,
+    STABLE_CHECK_API,
 } from '../utils/apis';
 import { DEFAULT_API_VERSIONS } from '../utils/versions';
 import { INFO_API_TYPES } from '../utils/api_types';
@@ -143,7 +144,7 @@ const fetchTranslations = async (type, slug, version) => {
  * @param {String}(optional) slug
  * @param {String}(optional) version - theme, plugin or core version
  */
-const fetchStats = async (type) => {
+const fetchStats = async (type, version) => {
     let response = {};
 
     try {
@@ -174,7 +175,7 @@ const fetchStats = async (type) => {
  * @param {String}(required) slug - plugins slug
  * @param {String}(optional) limit - No of days
  */
-const fetchPluginDownloads = async (slug, limit) => {
+const fetchPluginDownloads = async (slug, limit, version) => {
     let response = {},
         params = {
             slug,
@@ -207,10 +208,11 @@ const fetchPluginDownloads = async (slug, limit) => {
 /**
  * Fetch wordpress version info
  *
- * @param {String}(optional) version - To fetch versions released after given version
+ * @param {String}(optional) wp_version - To fetch versions released after given version
  * @param {String}(optional) locale - Locale
+ * @param {String}(api_version) api_version - API version
  */
-const fetchCoreVersionInfo = async (version, locale) => {
+const fetchCoreVersionInfo = async (wp_version, locale, api_version) => {
     let response = {},
         params = {
             version,
@@ -218,7 +220,7 @@ const fetchCoreVersionInfo = async (version, locale) => {
         };
 
     try {
-        const apiVersion = DEFAULT_API_VERSIONS['version-check'];
+        const apiVersion = DEFAULT_API_VERSIONS['core-version-check'];
         const url = `${CORE_VERSION_CHECK_API}/${apiVersion}`;
 
         response = await axios({
@@ -415,11 +417,46 @@ const fetchPopularImportPlugins = async () => {
 
     try {
         const apiVersion = DEFAULT_API_VERSIONS['importers'];
-        const url = `${POPULAR_IMPORT_PLUGINS}/${apiVersion}`;
+        const url = `${POPULAR_IMPORT_PLUGINS_API}/${apiVersion}`;
 
         response = await axios({
             url,
         });
+    } catch (error) {
+        const { message } = error || {};
+        throw new Error(message);
+    }
+
+    return response;
+};
+
+/**
+ * Check if a version of WordPress is latest, outdated, or insecure
+ *
+ * @param {String} wp_version - Wordpress version
+ */
+const fetchCoreVersionStability = async (wp_version) => {
+    let response = {};
+
+    try {
+        const apiVersion = DEFAULT_API_VERSIONS['stable-check'];
+        const url = `${STABLE_CHECK_API}/${apiVersion}`;
+
+        const apiResponse = await axios({
+            url,
+        });
+
+        if (wp_version) {
+            const data = _get(apiResponse, 'data', {}) || {};
+
+            if (!(wp_version in data)) {
+                throw new Error(`version ${wp_version} doesn't exist`);
+            }
+
+            response = data[wp_version];
+        } else {
+            response = { ...apiResponse };
+        }
     } catch (error) {
         const { message } = error || {};
         throw new Error(message);
@@ -440,4 +477,5 @@ export {
     generateSecretKey,
     fetchBrowserInfo,
     fetchPopularImportPlugins,
+    fetchCoreVersionStability,
 };

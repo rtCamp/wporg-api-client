@@ -5,6 +5,7 @@ import {
     fetchCoreCreditDetails,
     fetchCoreChecksums,
     fetchBrowserInfo,
+    fetchCoreVersionStability,
 } from '../wporg_server/';
 
 import { TRANSLATION_API_TYPES } from '../utils/api_types';
@@ -95,10 +96,24 @@ const getBrowserInfo = (useragent) => {
     return fetchBrowserInfo(useragent);
 };
 
+/**
+ * Fetch browser details
+ *
+ * @param {String} useragent
+ */
+const getCoreVersionStability = (version) => {
+    if (version && typeof version !== 'string') {
+        throw new Error('invalid version');
+    }
+
+    return fetchCoreVersionStability(version);
+};
+
 export {
     getCoreTranslations,
     getCoreVersionInfo,
     getCoreCreditDetails,
     getCoreChecksums,
     getBrowserInfo,
+    getCoreVersionStability,
 };
