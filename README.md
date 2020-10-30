@@ -344,4 +344,18 @@ Available API versions: 1.1
 
 	generateSecretKey()
 
+## List of popular import plugins in the WordPress Plugin Directory used by Tools → Import Screen.
+
+Available API version: 1.1
+
+	getPopularImportPlugins(api_version)
+
+### Usage
+
+	getPopularImportPlugins()
+
+
+
+
+
 
