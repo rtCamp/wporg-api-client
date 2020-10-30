@@ -4,128 +4,120 @@ WordPress.org API client built in node.js
 # Installation
 npm install wporg-api-client
 
+Note: add `--save` if you are using npm < 5.0.0
+
 # Examples
 
 # Core
 
-Available API versions:
+## Get Core Translation
 
-1.0: Returns JSON object
+ Available API versions: 1.0
 
-1. getCoreTranslations(wp_version, api_version)
+	getCoreTranslations(wp_version, api_version)
 
-	Note: wp_version starts from 4.0
+Note: wp_version starts from 4.0
 
-	Usage:-
+### Usage
 
 	getCoreTranslations('4.9.5')
 
+## Get Core Version Info
 
+Available API versions: 1.7
 
-Available API versions:
+	getCoreVersionInfo(wp_version, locale, api_version)
 
-1.7: Returns JSON object
-
-2. getCoreVersionInfo(wp_version, locale, api_version)
-
-	Usage:-
+### Usage
 
 	getCoreVersionInfo('4.0.1', 'eu')
 
+## Get Core Credit Details
 
+Available API versions: 1.1
 
-Available API versions:
+	getCoreCreditDetails(wp_version, locale, api_version)
 
-1.1: Returns JSON object
-
-3. getCoreCreditDetails(wp_version, locale, api_version);
-
-	Usage:-
+### Usage
 
 	getCoreCreditDetails('4.0.1', 'eu')
 
+## Get Core Checksums
 
+Available API versions: 1.0
 
-Available API versions:
+	getCoreChecksums(wp_version*, locale, api_version)
 
-1.0: Returns JSON object
-
-4. getCoreChecksums(wp_version*, locale, api_version)
-
-	Usage:-
+###	Usage
 
 	getCoreChecksums('5.5.1', 'eu')
 
+## Get Browser Info
 
-Available API versions:
+Available API versions: 1.1
 
-1.1: Returns JSON object
+	getBrowserInfo(useragent*)
 
-
-
-5. getBrowserInfo(useragent*)
-
-	Usage:-
+###	Usage
 
 	getBrowserInfo('Chrome/86.0')
 
+## Get Core Version Stability Info
 
+Available API versions: 1.0
 
-Available API versions:
+	getCoreVersionStabilityInfo(wp_version, api_version)
 
-1.0: Returns JSON object
+###	Usage
 
-6. getCoreVersionStabilityInfo(wp_version, api_version)
+	getCoreVersionStabilityInfo() //returns all versions info
 
-	Usage:-
-
-	getCoreVersionStabilityInfo()	//returns all versions info
 	getCoreVersionStabilityInfo('4.6.20')	//returns specific version info
 
+## Get Core Statistics
 
-Available API versions:
+Available API versions: 1.0
 
-1.0: Returns JSON object
 
-7. getCoreStats(api_version)
+	getCoreStats(api_version)
 
-	Usage:-
+###	Usage
 
 	getCoreStats()
 
 
 # Plugins
 
-Filters list:-
+**Filters list**
 
-	1. search(string): Textual search, using a free-form string
+* search(string): Textual search, using a free-form string
 
-	2. tag('string' | 'array'): Return themes with a specified tag or set of tags(array of strings)
+* tag('string' | 'array'): Return themes with a specified tag or set of tags(array of strings)
 
-	3. author(string):	WordPress.org username of the author, pass this filter to return themes authored by them
+* author(string):	WordPress.org username of the author, pass this filter to return plugins authored by them
 
-	4. page(number): page number
-	default: 1
+* page(number): page number
+default: 1
 
-	5. per_page(number): Themes to show per page
-	default: 24
+* per_page(number): Plugins to show per page
+default: 24
 
-	6. browse(string): Predefined themes ordering. Possible values are:-
+* browse(string): Predefined themes ordering. Possible values are
 
-		popular: Themes ordered by popularity
-		featured: Set of featured themes
-		updated: Recently updated themes
-		new: Latest themes
+	*	popular: Plugins ordered by popularity
+	*	featured: Set of featured plugins
+	*	updated: Recently updated plugins
+	*	new: Latest plugins
 
 
 
-Available API versions:
-	1.1: Returns JSON object
-	1.2: Returns JSON object
+Available API versions: 1.1, 1.2
 
-1. getPluginsList(filters, api_version)
+## Get plugins list
 
-	Usage:-
+	getPluginsList(filters, api_version)
+
+### Usage
 
 	getPluginsList()
 
@@ -137,92 +129,96 @@ Available API versions:
 		//... other filters
 	})
 
-2. filterPluginsBy(filter_key*, filter_value*, page, per_page, api_version)
+##	Filter Plugins By
 
-	Usage:-
+	filterPluginsBy(filter_key*, filter_value*, page, per_page, api_version)
+
+### Usage
 
 	filterPluginsBy('search', 'buddypress', 1, 5)
 	filterPluginsBy('tag', ['popup', 'slideshow'])
 	filterPluginsBy('author', 'wordpressdotorg', 2, 3)
 	filterPluginsBy('browse', 'popular')
 
-3. getPluginInfo(plugin_slug, api_version)
+## Get Plugins Info
 
-	Usage:-
+	getPluginInfo(plugin_slug, api_version)
+
+### Usage
 
 	getPluginInfo('wordpress-seo');
 
-4. getPluginHotTagsList(api_version)
+## Get Plugin Hot Tags List
 
-	Note: tags_count is not implemented in the original api yet
+	getPluginHotTagsList(api_version)
 
-	Usage:-
+Note: tags_count is not implemented in the original api yet
+
+### Usage
 	getPluginHotTagsList()
 
 
+## Get Plugin Translations
 
-Available API versions:
+Available API versions: 1.0
 
-1.0: Returns JSON object
 
-5. getPluginTranslations(slug, plugin_version, api_version)
+	getPluginTranslations(slug, plugin_version, api_version)
 
-	Usage:-
+### Usage
 
 	getPluginTranslations('classic-editor', 1.5);
 
+## Get Plugin Downloads
 
-Available API versions:
+Available API versions: 1.0
 
-1.0: Returns JSON object
+	getPluginDownloads(plugin_slug*, limit, api_version)
 
-6. getPluginDownloads(plugin_slug*, limit, api_version)
+limit: Downloads in last {limit} days
 
-	limit: Downloads in last {limit} days
-
-	Usage:-
+### Usage
 
 	getPluginDownloads('classic-editor', 7)
 
-7. getPluginStats(plugin_slug*, api_version)
+## Get Plugin Statistics
 
-	Usage:-
+	getPluginStats(plugin_slug*, api_version)
+
+### Usage
 
 	getPluginStats('classic-editor)
 
 # Themes
 
-Filters list:-
+**Filters list**
 
-	1. search(string): Textual search, using a free-form string
+*	search(string): Textual search, using a free-form string
 
-	2. tag('string' | 'array'): Return themes with a specified tag or set of tags(array of strings)
+* tag('string' | 'array'): Return themes with a specified tag or set of tags(array of strings)
 
-	3. theme(string): Slug of a specific theme to return
+*	theme(string): Slug of a specific theme to return
 
-	4. author(string):	WordPress.org username of the author, pass this filter to return themes authored by them
+*	author(string):	WordPress.org username of the author, pass this filter to return themes authored by them
 
-	5. page(number): page number
+*	page(number): page number
 	default: 1
 
-	6. per_page(number): Themes to show per page
+*	per_page(number): Themes to show per page
 	default: 24
 
-	7. browse(string): Predefined themes ordering. Possible values are:-
+*	browse(string): Predefined themes ordering. Possible values are
 
-		popular: Themes ordered by popularity
-		featured: Set of featured themes
-		updated: Recently updated themes
-		new: Latest themes
+	* popular: Themes ordered by popularity
+	* featured: Set of featured themes
+	* updated: Recently updated themes
+	* new: Latest themes
 
-Available API versions:
+Available API versions: 1.1, 1.2
 
-1.1: Returns JSON object
-1.2: Returns JSON object
+	getPluginsList(filters, api_version)
 
-1. getPluginsList(filters, api_version)
-
-	Usage:-
+### Usage
 
 	getPluginsList()
 
@@ -234,116 +230,118 @@ Available API versions:
 		//... other filters
 	})
 
-2. filterThemesBy(filter_key*, filter_value*, page, per_page, api_version)
+## Filter Themes By
 
-	Usage:-
+	filterThemesBy(filter_key*, filter_value*, page, per_page, api_version)
+
+### Usage
 
 	filterThemesBy('search', 'grid', 1, 15)
+
 	filterThemesBy('tag', ['photography', 'blue'])
+
 	filterThemesBy('theme', 'gridmag')
+
 	filterThemesBy('author', 'wordpressdotorg', 2, 3)
+
 	filterThemesBy('browse', 'popular')
 
-3. getThemeInfo(theme_slug, api_version)
+## Get Theme Info
 
-	Usage:-
+   getThemeInfo(theme_slug, api_version)
+
+### Usage
 
 	getThemeInfo('simple-grid')
 
-4. getPopularThemeTags(tags_count, api_version)
+## Get Popular Theme Tags
 
-	Usage:-
+	getPopularThemeTags(tags_count, api_version)
+
+### Usage
 
 	getPopularThemeTags()
+
 	getPopularThemeTags(5)
 
+## Get Theme Translations
 
+Available API versions: 1.0
 
-Available API versions:
+	getThemeTranslations(theme_slug*, theme_version, api_version)
 
-1.0: Returns JSON object
-
-5. getThemeTranslations(theme_slug*, theme_version, api_version)
-
-	Usage:
+### Usage:
 
 	getThemeTranslations('grocery-store', 1.0.2)
 
-
-
 # Events
 
-Available API versions:
+## Get Upcoming WordCamps and meetups details, filterable by location.
 
-1.0: Returns JSON object
+Filters list
 
-Params list:-
+## Main Filters
 
-    1.location(string):
+* location(string):
 
-    2.latitude(number | string) and longitude(number | string)
+* latitude(number | string) and longitude(number | 		string)
 
-	3.ip(string):
+* ip(string)
 
-	4.country(string): Country name
+* country(string): Country name
 
-	Params to be used in conjunction with others:
+## Filters To Be Used In Conjunction With Others
 
-	1.number(number): No of events to show
+* timezone(string)
 
-    2.locale(string)
+* number(number): No of events to show
 
-    3.timezone(string)
-
-
+* locale(string)
 
 
-1. getEventDetails(params, api_version)
 
-Usage:-
+	getEventDetails(params, api_version)
 
-getEventDetails({
-	country: 'IT',
-});
-getEventDetails({
-	ip: '136.0.16.1',
-})
-getEventDetails({
-	latitude: '41.900001525879',
-	longitude: '12.479999542236',
-})
-getEventDetails({
-	location: 'Australia',
-})
-getEventDetails({
-	number:5,
-	location:'Australia'
-})
+### Usage
+
+	getEventDetails({ country: 'IT' });
+
+	getEventDetails({ ip: '136.0.16.1' })
+
+	getEventDetails({
+		latitude: '41.900001525879'
+		longitude: '12.479999542236'
+	})
+
+	getEventDetails({ location: 'Australia' })
+
+	getEventDetails({ number:5, location:'Australia' })
 
 
-# Other
+# Others
 
-Available API versions:
+## Get Statistics of Php, MySql and Wordpress
 
-1.0: Returns JSON object
+Available API versions: 1.0
 
-1. getStats(type, api_version)
+	getStats(type, api_version)
 
-Usage:-
+### Usage
 
-getStats('php')
-getStats('mysql')
-getStats('wordpress')
+	getStats('php')
 
+	getStats('mysql')
 
-Available API versions:
+	getStats('wordpress')
 
-1.1: Returns JSON object
+## Generate Secret Key
 
-1. generateSecretKey(api_version)
+Available API versions: 1.1
 
-Usage:-
+	generateSecretKey(api_version)
 
-generateSecretKey()
+### Usage
+
+	generateSecretKey()
 
 
