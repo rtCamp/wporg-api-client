@@ -4,25 +4,29 @@
   "description": "Node.js client for wordpress.org APIs",
   "main": "main.js",
   "scripts": {
-	"start": "node main.js",
-	"dev": "nodemon main.js",
+    "start": "node main.js",
+    "dev": "nodemon main.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/rtCamp/wporg-api-client.git"
   },
+  "keywords": [
+    "npm",
+    "wporg-api",
+    "wporg-api-node-client",
+    "wordpress-apis-node-client"
+  ],
   "author": "rtCamp",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/rtCamp/wporg-api-client/issues"
   },
   "homepage": "https://github.com/rtCamp/wporg-api-client#readme",
   "dependencies": {
     "axios": "^0.21.0",
-    "cors": "^2.8.5",
     "esm": "^3.2.25",
-    "express": "^4.17.1",
     "lodash": "^4.17.20"
   },
   "devDependencies": {
