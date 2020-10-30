@@ -14,9 +14,6 @@ import { isValidVersion } from '../utils/generic_functions';
  * @param {Object} params
  */
 const fetchInfo = async (url, params) => {
-    console.log(url, 'url');
-    console.log(params, 'params');
-
     let response = {};
 
     try {
@@ -46,8 +43,6 @@ const fetchInfo = async (url, params) => {
  * @param {Object} params
  */
 const fetchTranslations = async (url, params) => {
-    console.log(url, 'url');
-    console.log(params, 'params');
     let response = {};
 
     try {
@@ -77,9 +72,6 @@ const fetchTranslations = async (url, params) => {
  * @param {Object} params
  */
 const fetchCoreVersionInfo = async (url, params) => {
-    console.log(url, 'url');
-    console.log(params, 'params');
-
     let response = {};
 
     try {
@@ -191,7 +183,7 @@ const fetchBrowserInfo = async (url, params) => {
  *
  * @param {String} api_version
  */
-const fetchPopularImportPlugins = async (api_version) => {
+const getPopularImportPlugins = async (api_version) => {
     let response = {};
 
     try {
@@ -368,7 +360,7 @@ export {
     fetchCoreCreditDetails,
     fetchCoreChecksums,
     fetchBrowserInfo,
-    fetchPopularImportPlugins,
+    getPopularImportPlugins,
     fetchCoreVersionStabilityInfo,
     fetchEventDetails,
     fetchStats,
