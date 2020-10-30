@@ -15,11 +15,10 @@ Note: add `--save` if you are using npm < 5.0.0
 
 		try {
 			data = await getPluginsList();
+			console.log(data, "data");
 		} catch (error) {
 			console.log(error.message, "error");
 		}
-
-		console.log(data, "data");
 	};
 
 	pluginsList();
