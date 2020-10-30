@@ -3,18 +3,20 @@ import _get from 'lodash/get';
 
 /** Utilities */
 import axios from '../utils/axios_instance';
-import { SECRET_KEY_API, SALT_API, CORE_BROWSE_HAPPY_API, CORE_POPULAR_IMPORT_PLUGINS_API } from '../utils/apis';
+import { SECRET_KEY_API, SALT_API, CORE_POPULAR_IMPORT_PLUGINS_API } from '../utils/apis';
 import { API_VERSIONS, DEFAULT_API_VERSIONS } from '../utils/versions';
 import { isValidVersion } from '../utils/generic_functions';
 
 /**
  * Fetch themes or plugins info
  *
- * @param {String}(required) type - themes | plugins
- * @param {String}(required) action
- * @param {Object}(optional) args
+ * @param {String} url
+ * @param {Object} params
  */
 const fetchInfo = async (url, params) => {
+    console.log(url, 'url');
+    console.log(params, 'params');
+
     let response = {};
 
     try {
@@ -23,9 +25,9 @@ const fetchInfo = async (url, params) => {
             params,
         });
 
-        /** Throw error if api contains error object */
         const responseData = _get(response, 'data', {}) || {};
 
+        /** Throw error if api contains error object */
         if ('error' in responseData) {
             throw new Error(_get(response, 'data.error', {}));
         }
@@ -40,11 +42,12 @@ const fetchInfo = async (url, params) => {
 /**
  * Fetch available translations
  *
- * @param {String}(required) type - themes | plugins | core
- * @param {String}(optional) slug
- * @param {String}(optional) version - theme, plugin or core version
+ * @param {String} url
+ * @param {Object} params
  */
 const fetchTranslations = async (url, params) => {
+    console.log(url, 'url');
+    console.log(params, 'params');
     let response = {};
 
     try {
@@ -70,10 +73,13 @@ const fetchTranslations = async (url, params) => {
 /**
  * Fetch wordpress version info
  *
- * @param {String}(optional) wp_version - To fetch versions released after given version
- * @param {String}(optional) locale - Locale
+ * @param {String} url
+ * @param {Object} params
  */
 const fetchCoreVersionInfo = async (url, params) => {
+    console.log(url, 'url');
+    console.log(params, 'params');
+
     let response = {};
 
     try {
@@ -99,8 +105,8 @@ const fetchCoreVersionInfo = async (url, params) => {
 /**
  * Fetch details of individual contributors in wordpress codebase
  *
- * @param {String}(optional) wp_version
- * @param {String}(optional) locale
+ * @param {String} url
+ * @param {Object} params
  */
 const fetchCoreCreditDetails = async (url, params) => {
     /** @todo check wordpress version */
@@ -131,8 +137,8 @@ const fetchCoreCreditDetails = async (url, params) => {
  * release / locale. Although english is the default, it's suggested to pass
  * it for 100% compatibility with core.
  *
- * @param {String}(required) wp_version
- * @param {String}(optional) locale
+ * @param {String} url
+ * @param {Object} params
  */
 const fetchCoreChecksums = async (url, params) => {
     let response = {};
@@ -160,7 +166,8 @@ const fetchCoreChecksums = async (url, params) => {
 /**
  * Fetch browser details
  *
- * @param {String}(required) useragent
+ * @param {String} url
+ * @param {Object} params
  */
 const fetchBrowserInfo = async (url, params) => {
     let response = {};
@@ -208,9 +215,10 @@ const fetchPopularImportPlugins = async (api_version) => {
 /**
  * Check if a version of WordPress is latest, outdated, or insecure
  *
+ * @param {String} url
  * @param {String} wp_version - Wordpress version
  */
-const fetchCoreVersionStability = async (url, wp_version) => {
+const fetchCoreVersionStabilityInfo = async (url, wp_version) => {
     let response = {};
 
     try {
@@ -226,7 +234,7 @@ const fetchCoreVersionStability = async (url, wp_version) => {
                 throw new Error(`version ${wp_version} doesn't exist`);
             }
 
-            response = data[wp_version];
+            response = { data: data[wp_version] };
         } else {
             /** If version is not provided pass all versions info */
             response = { ...apiResponse };
@@ -242,7 +250,8 @@ const fetchCoreVersionStability = async (url, wp_version) => {
 /**
  * Upcoming WordCamps and meetup events, filterable by location.
  *
- * @param {Object}(required) args - List of arguments
+ * @param {String} url
+ * @param {Object} params
  */
 const fetchEventDetails = async (url, params) => {
     let response = {};
@@ -273,8 +282,7 @@ const fetchEventDetails = async (url, params) => {
 /**
  * Fetch stats
  *
- * @param {String}(required) type - themes | plugins | core
- * @param {String}(required(when type is plugin) | optional) slug - Plugin slug
+ * @param {String} url
  */
 const fetchStats = async (url) => {
     let response = {};
@@ -301,8 +309,8 @@ const fetchStats = async (url) => {
 /**
  * Fetch plugin number of downloads
  *
- * @param {String}(required) slug - plugins slug
- * @param {String}(optional) limit - No of days
+ * @param {String} url
+ * @param {Object} params
  */
 const fetchPluginDownloads = async (url, params) => {
     let response = {};
@@ -330,7 +338,7 @@ const fetchPluginDownloads = async (url, params) => {
 /**
  * Secret key generator for wp-config.php
  *
- * @param {String}(optional) api_version
+ * @param {String} api_version
  */
 const generateSecretKey = async (api_version) => {
     let response = {};
@@ -361,7 +369,7 @@ export {
     fetchCoreChecksums,
     fetchBrowserInfo,
     fetchPopularImportPlugins,
-    fetchCoreVersionStability,
+    fetchCoreVersionStabilityInfo,
     fetchEventDetails,
     fetchStats,
     fetchPluginDownloads,

@@ -5,12 +5,21 @@ import {
     fetchCoreCreditDetails,
     fetchCoreChecksums,
     fetchBrowserInfo,
-    fetchCoreVersionStability,
+    fetchCoreVersionStabilityInfo,
+    fetchStats,
 } from '../wporg_server/';
 
 /** Utilities */
-import { TRANSLATIONS_API, CORE_VERSION_CHECK_API, CORE_STABLE_CHECK_API } from '../utils/apis';
-import { TRANSLATION_API_TYPES } from '../utils/api_types';
+import {
+    TRANSLATIONS_API,
+    CORE_VERSION_CHECK_API,
+    CORE_STABLE_CHECK_API,
+    CORE_CREDITS_API,
+    CORE_CHECKSUMS_API,
+    CORE_BROWSE_HAPPY_API,
+    STATS_API,
+} from '../utils/apis';
+import { TRANSLATION_API_TYPES, STATS_API_TYPES } from '../utils/api_types';
 import { API_VERSIONS, WORDPRESS_VERSIONS, DEFAULT_API_VERSIONS } from '../utils/versions';
 import { isValidVersion } from '../utils/generic_functions';
 
@@ -20,11 +29,11 @@ const translationType = TRANSLATION_API_TYPES && Array.isArray(TRANSLATION_API_T
 /**
  * Get wordpress translations
  *
- * @param {String} version(optional) - Wordpress version, fallbacks to the latest version of not passed
+ * @param {String} wp_version - version number starts from 4.0, fallbacks to the latest version of not passed
  * @param {String} api_version
  */
 const getCoreTranslations = (wp_version, api_version) => {
-    if (isValidVersion(wp_version, WORDPRESS_VERSIONS)) {
+    if (!isValidVersion(wp_version, WORDPRESS_VERSIONS)) {
         throw new Error('invalid wordpress version');
     }
 
@@ -44,12 +53,12 @@ const getCoreTranslations = (wp_version, api_version) => {
 /**
  * Get wordpress version info
  *
- * @param {String} version - To fetch versions released after given version
+ * @param {String} wp_version - To fetch version details released after given version
  * @param {String} locale - Locale
  * @param {String} api_version
  */
 const getCoreVersionInfo = (wp_version, locale, api_version) => {
-    if (version && isValidVersion(wp_version, WORDPRESS_VERSIONS)) {
+    if (wp_version && !isValidVersion(wp_version, WORDPRESS_VERSIONS)) {
         throw new Error('invalid wordpress version');
     }
 
@@ -62,6 +71,10 @@ const getCoreVersionInfo = (wp_version, locale, api_version) => {
         locale,
     };
 
+    if (!isValidVersion(api_version, API_VERSIONS['core_version_check_api'])) {
+        api_version = DEFAULT_API_VERSIONS['core-version-check'];
+    }
+
     const url = `${CORE_VERSION_CHECK_API}/${api_version}`;
 
     return fetchCoreVersionInfo(url, params);
@@ -70,12 +83,12 @@ const getCoreVersionInfo = (wp_version, locale, api_version) => {
 /**
  * Fetch details of individual contributors in wordpress codebase
  *
- * @param {String} wp_version - Wordpress version
+ * @param {String} wp_version
  * @param {String} locale
  * @param {String} api_version
  */
 const getCoreCreditDetails = (wp_version, locale, api_version) => {
-    if (version && isValidVersion(wp_version, WORDPRESS_VERSIONS)) {
+    if (wp_version && !isValidVersion(wp_version, WORDPRESS_VERSIONS)) {
         throw new Error('invalid wordpress version');
     }
 
@@ -111,7 +124,7 @@ const getCoreChecksums = (wp_version, locale, api_version) => {
         throw new Error('wordpress version is required');
     }
 
-    if (isValidVersion(wp_version, WORDPRESS_VERSIONS)) {
+    if (!isValidVersion(wp_version, WORDPRESS_VERSIONS)) {
         throw new Error('invalid wordpress version');
     }
 
@@ -162,12 +175,12 @@ const getBrowserInfo = (useragent, api_version) => {
 };
 
 /**
- * Fetch browser details
+ * Get wordpress versions stability info
  *
- * @param {String} wp_version - Wordpress version
+ * @param {String} wp_version
  * @param {String} api_version
  */
-const getCoreVersionStability = (wp_version, api_version) => {
+const getCoreVersionStabilityInfo = (wp_version, api_version) => {
     if (wp_version && isValidVersion(wp_version, WORDPRESS_VERSIONS)) {
         throw new Error('invalid wordpress version');
     }
@@ -178,7 +191,23 @@ const getCoreVersionStability = (wp_version, api_version) => {
 
     const url = `${CORE_STABLE_CHECK_API}/${api_version}`;
 
-    return fetchCoreVersionStability(url, wp_version);
+    return fetchCoreVersionStabilityInfo(url, wp_version);
+};
+
+/**
+ * Get wordpress stats
+ *
+ * @param {String} api_version
+ */
+const getCoreStats = (api_version) => {
+    if (!isValidVersion(api_version, API_VERSIONS['stats_api'])) {
+        api_version = DEFAULT_API_VERSIONS['stats'];
+    }
+
+    const type = STATS_API_TYPES[0]; //it should be wordpress
+    const url = `${STATS_API}/${type}/${api_version}`;
+
+    return fetchStats(url);
 };
 
 export {
@@ -187,5 +216,6 @@ export {
     getCoreCreditDetails,
     getCoreChecksums,
     getBrowserInfo,
-    getCoreVersionStability,
+    getCoreVersionStabilityInfo,
+    getCoreStats,
 };

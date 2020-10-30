@@ -5,6 +5,7 @@ import { fetchStats } from '../wporg_server/';
 import { STATS_API } from '../utils/apis';
 import { STATS_API_TYPES } from '../utils/api_types';
 import { API_VERSIONS, DEFAULT_API_VERSIONS } from '../utils/versions';
+import { isValidVersion } from '../utils/generic_functions';
 
 /**
  * Get stats

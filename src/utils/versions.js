@@ -2,7 +2,7 @@ const API_VERSIONS = {
     /**
      * Themes and Plugins info API versions
      * */
-    info_api: ['1.0', '1.1'],
+    info_api: ['1.1', '1.2'],
 
     /**
      * Translations API versions
@@ -12,9 +12,9 @@ const API_VERSIONS = {
     /**
      * Core API versions
      * */
-    core_version_check_api: ['1.6', '1.7'],
+    core_version_check_api: ['1.7'],
 
-    core_credits_api: ['1.0', '1.1'],
+    core_credits_api: ['1.1'],
 
     core_checksums_api: ['1.0'],
 
@@ -34,7 +34,7 @@ const API_VERSIONS = {
      * */
     stats_api: ['1.0'],
 
-    secret_key_api: ['1.0', '1.1'],
+    secret_key_api: ['1.1'],
 };
 
 /**
@@ -495,7 +495,7 @@ const WORDPRESS_VERSIONS = [
  * Default versions of API
  * */
 const DEFAULT_API_VERSIONS = {
-    themes: '1.1',
+    themes: '1.2',
     plugins: '1.2',
     translations: '1.0',
     'core-version-check': '1.7',

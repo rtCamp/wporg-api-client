@@ -58,8 +58,8 @@ const event_params = {
     location: 'string',
     locale: 'string',
     timezone: 'string',
-    latitude: ['number , string'],
-    longitude: ['number , string'],
+    latitude: ['number', 'string'],
+    longitude: ['number', 'string'],
     ip: 'string',
     country: 'string',
 };

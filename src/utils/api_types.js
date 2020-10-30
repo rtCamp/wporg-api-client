@@ -13,4 +13,7 @@ const TRANSLATION_API_TYPES = ['themes', 'plugins', 'core'];
 /** plugins is not added because it is passed directly in the getPluginStats method */
 const STATS_API_TYPES = ['wordpress', 'php', 'mysql'];
 
-export { INFO_API_TYPES, TRANSLATION_API_TYPES, STATS_API_TYPES };
+/** Kept this separate from STATS_API_TYPES because plugin type is used only in plugin file */
+const STATS_API_TYPES_FOR_PLUGIN = 'plugin';
+
+export { INFO_API_TYPES, TRANSLATION_API_TYPES, STATS_API_TYPES, STATS_API_TYPES_FOR_PLUGIN };

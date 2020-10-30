@@ -37,7 +37,6 @@ const doesElementHaveOneOfType = (element, type_array) => {
     if (!Array.isArray(type_array)) {
         throw new Error(`${type_array} should be array`);
     }
-
     const elementType = typeof element;
 
     /** Handle array types differently because type of array is object in JS */
@@ -66,12 +65,8 @@ const doesElementHaveOneOfType = (element, type_array) => {
  *
  */
 const isValidVersion = (version, versions_array) => {
-    if (!version) {
-        throw new Error('version is required');
-    }
-
-    if (!versions_array || Array.isArray(versions_array)) {
-        throw new Array('version array is required and should be array');
+    if (!versions_array || !Array.isArray(versions_array)) {
+        throw new Error('version array is required and should be array');
     }
     if (versions_array.indexOf(version) !== -1) {
         return true;
@@ -80,8 +75,4 @@ const isValidVersion = (version, versions_array) => {
     return false;
 };
 
-export {
-    hasCorrectElementTypesInArray,
-    doesElementHaveOneOfType,
-    isValidVersion,
-};
+export { hasCorrectElementTypesInArray, doesElementHaveOneOfType, isValidVersion };

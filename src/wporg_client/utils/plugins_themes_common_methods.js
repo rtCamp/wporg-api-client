@@ -8,8 +8,9 @@ import {
     query_plugins_params,
     query_plugin_filter_params,
     browse_values,
-} from './arguments';
+} from './params';
 import { INFO_API_TYPES } from '../../utils/api_types';
+import { hasCorrectElementTypesInArray } from '../../utils/generic_functions';
 
 /**
  * Checks if type is correct or not
@@ -43,18 +44,23 @@ const isInfoListParamsValid = (params, type) => {
         throw new Error('params are required');
     }
 
+    let isValid = true,
+        errors = [];
+
+    const params_list = type === 'themes' ? query_themes_params : query_plugins_params;
+
     /** Check if a valid object */
     if (params) {
         if (!isObject(params) || Array.isArray(params)) {
             isValid = false;
             errors.push('params should be an object');
+
+            return {
+                isValid,
+                errors,
+            };
         }
     }
-
-    let isValid = true,
-        errors = [];
-
-    const params_list = type === 'themes' ? query_themes_params : query_plugins_params;
 
     /** Check each argument and it's type */
     for (let property in params) {
@@ -64,6 +70,11 @@ const isInfoListParamsValid = (params, type) => {
         if (!(property in params_list)) {
             isValid = false;
             errors.push(`property ${property} doesn't exist`);
+
+            return {
+                isValid,
+                errors,
+            };
         }
 
         /** Check property value data type */
@@ -75,10 +86,26 @@ const isInfoListParamsValid = (params, type) => {
             } else {
                 isValid = false;
                 errors.push('property tag should be either string or array of strings');
+
+                return {
+                    isValid,
+                    errors,
+                };
             }
         } else if (typeof propertyValue != params_list[property]) {
             isValid = false;
-            errors.push(`property ${property} should be ${params_list[property]}, passed ${typeof propertyValue}`);
+
+            const propertyType = property in params_list ? params_list[property] : undefined;
+            const message = propertyType
+                ? `property ${property} should be ${propertyType}, passed ${typeof propertyValue}`
+                : `invalid property ${property}`;
+
+            errors.push(message);
+
+            return {
+                isValid,
+                errors,
+            };
         }
 
         /** Check if browse filter have correct values passed */
@@ -86,6 +113,11 @@ const isInfoListParamsValid = (params, type) => {
             if (browse_values.indexOf(propertyValue) === -1) {
                 isValid = false;
                 errors.push(`incorrect value provided for property ${property}, possible values are ${browse_values}`);
+
+                return {
+                    isValid,
+                    errors,
+                };
             }
         }
     }
@@ -119,16 +151,34 @@ const isFilterInfoListParamsValid = (filter_key, filter_value, page, per_page, t
 
     /** Check if filter key and filter value is passed */
     if (!filter_key) {
+        isValid = false;
         errors.push('filter key is required');
+
+        return {
+            isValid,
+            errors,
+        };
     }
 
     if (!filter_value) {
+        isValid = false;
         errors.push('filter value is required');
+
+        return {
+            isValid,
+            errors,
+        };
     }
 
     /** Check if supported filter is passed */
     if (!(filter_key in params_list)) {
-        errors.push(`filter ${filter_key} is not supported, possible options are ${Object.keys(params_list)}!`);
+        isValid = false;
+        errors.push(`filter ${filter_key} is not supported, possible options are ${Object.keys(params_list)}`);
+
+        return {
+            isValid,
+            errors,
+        };
     }
 
     /** Check filter value data type */
@@ -138,27 +188,59 @@ const isFilterInfoListParamsValid = (filter_key, filter_value, page, per_page, t
             (Array.isArray(filter_value) && hasCorrectElementTypesInArray(filter_value, 'string'))
         ) {
         } else {
-            errors.push('tag should be either string or array of strings!');
+            isValid = false;
+            errors.push('tag should be either string or array of strings');
+
+            return {
+                isValid,
+                errors,
+            };
         }
     } else if (typeof filter_value != params_list[filter_key]) {
-        errors.push(`filter ${filter_key} should be ${params_list[filter_key]}, passed ${typeof filter_value}`);
+        isValid = false;
+        errors.push(
+            `filter value of ${filter_key} should be ${params_list[filter_key]}, passed ${typeof filter_value}`,
+        );
+
+        return {
+            isValid,
+            errors,
+        };
     }
 
     /** Check if browse filter have correct values passed */
     if (filter_key === 'browse') {
         if (browse_values.indexOf(filter_value) === -1) {
+            isValid = false;
             errors.push(`incorrect value provided for filter ${filter_key}, possible values are ${browse_values}`);
+
+            return {
+                isValid,
+                errors,
+            };
         }
     }
 
     /** Check if page type is correct */
     if (page && typeof page !== 'number') {
+        isValid = false;
         errors.push(`page should be number`);
+
+        return {
+            isValid,
+            errors,
+        };
     }
 
     /** Check if per page type is correct */
     if (per_page && typeof per_page !== 'number') {
+        isValid = false;
         errors.push(`per page should be number`);
+
+        return {
+            isValid,
+            errors,
+        };
     }
 
     return {
@@ -194,7 +276,7 @@ const createParamsObj = (params) => {
         let value = params[property];
 
         paramsObj = {
-            ...params,
+            ...paramsObj,
             [key]: value,
         };
     }
@@ -205,32 +287,23 @@ const createParamsObj = (params) => {
 /**
  * Concatenate tags from tags array
  *
- * @param {Object} params*
+ * @param {Array} tag_array*
  *
  * @returns {String} concatenated tags
  */
-const concatenateTags = (params) => {
-    /** Check if params is a valid object */
-    if (params) {
-        if (!isObject(params) || Array.isArray(params)) {
-            throw new Error('params should be object');
-        }
+const concatenateTags = (tag_array) => {
+    /** Check if tag_array is a valid array */
+    if (tag_array && !Array.isArray(tag_array)) {
+        throw new Error("tag_array should be array and can't be empty");
     }
 
-    const concatenatedTags = '';
+    let concatenatedTags = '';
 
-    /** Checking if tag exists in params object amd it's an array, if not an array then
-     * 	will be handled like normal arg
-     * */
-    if ('tag' in params && Array.isArray(params['tag'])) {
-        const tags = params['tag'];
+    tag_array.forEach((item) => {
+        const tag = `&request[tag]=${item}`;
 
-        tags.forEach((item) => {
-            const tag = `&request[tag]=${item}`;
-
-            concatenatedTags += tag;
-        });
-    }
+        concatenatedTags += tag;
+    });
 
     return concatenatedTags;
 };
