@@ -183,7 +183,7 @@ const fetchBrowserInfo = async (url, params) => {
  *
  * @param {String} api_version
  */
-const fetchPopularImportPlugins = async (api_version) => {
+const getPopularImportPlugins = async (api_version) => {
     let response = {};
 
     try {
@@ -360,7 +360,7 @@ export {
     fetchCoreCreditDetails,
     fetchCoreChecksums,
     fetchBrowserInfo,
-    fetchPopularImportPlugins,
+    getPopularImportPlugins,
     fetchCoreVersionStabilityInfo,
     fetchEventDetails,
     fetchStats,

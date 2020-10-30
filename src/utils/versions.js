@@ -20,7 +20,7 @@ const API_VERSIONS = {
 
     core_browse_happy_api: ['1.1'],
 
-    core_popular_import_plugins_api: ['1.0', '1.1'],
+    core_popular_import_plugins_api: ['1.1'],
 
     core_stable_check_api: ['1.0'],
 
