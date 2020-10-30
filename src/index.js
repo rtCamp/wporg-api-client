@@ -1,4 +1,4 @@
 /** Methods */
-import * as methods from './wporg_client/core';
+import * as methods from './wporg_client/';
 
 export default methods;

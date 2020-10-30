@@ -8,6 +8,22 @@ Note: add `--save` if you are using npm < 5.0.0
 
 # Examples
 
+	const { getPluginsList } = require("wporg-api-client");
+
+	const pluginsList = async () => {
+		let data = {};
+
+		try {
+			data = await getPluginsList();
+		} catch (error) {
+			console.log(error.message, "error");
+		}
+
+		console.log(data, "data");
+	};
+
+	pluginsList();
+
 # Core
 
 ## Get Core Translation
