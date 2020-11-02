@@ -6,22 +6,28 @@ npm install wporg-api-client
 
 Note: add `--save` if you are using npm < 5.0.0
 
-# Examples
+# Example
 
-	const { getPluginsList } = require("wporg-api-client");
+```javascript
+//To Fetch All Plugins List
 
-	const pluginsList = async () => {
-		let data = {};
+const { getPluginsList } = require("wporg-api-client");
 
-		try {
-			data = await getPluginsList();
-			console.log(data, "data");
-		} catch (error) {
-			console.log(error.message, "error");
-		}
-	};
+const pluginsList = async () => {
+	let data = {};
 
-	pluginsList();
+	try {
+		data = await getPluginsList();
+		console.log(data, "data");
+	} catch (error) {
+		console.log(error.message, "error");
+	}
+};
+
+pluginsList();
+```
+
+Note: Asterisk(*) is used to denote required arguments
 
 # Core
 
@@ -29,77 +35,104 @@ Note: add `--save` if you are using npm < 5.0.0
 
  Available API versions: 1.0
 
-	getCoreTranslations(wp_version, api_version)
+```javascript
+getCoreTranslations(wp_version, api_version)
+```
 
 Note: wp_version starts from 4.0
 
 ### Usage
 
-	getCoreTranslations('4.9.5')
+```javascript
+getCoreTranslations('4.9.5')
+```
 
 ## Get Core Version Info
 
 Available API versions: 1.7
 
-	getCoreVersionInfo(wp_version, locale, api_version)
+```javascript
+getCoreVersionInfo(wp_version, locale, api_version)
+```
 
 ### Usage
 
-	getCoreVersionInfo('4.0.1', 'eu')
+```javascript
+getCoreVersionInfo('4.0.1', 'eu')
+```
 
 ## Get Core Credit Details
 
 Available API versions: 1.1
 
-	getCoreCreditDetails(wp_version, locale, api_version)
+```javascript
+getCoreCreditDetails(wp_version, locale, api_version)
+```
 
 ### Usage
 
-	getCoreCreditDetails('4.0.1', 'eu')
+```javascript
+getCoreCreditDetails('4.0.1', 'eu')
+```
 
 ## Get Core Checksums
 
 Available API versions: 1.0
 
-	getCoreChecksums(wp_version*, locale, api_version)
+```javascript
+getCoreChecksums(wp_version*, locale, api_version)
+```
 
 ###	Usage
 
-	getCoreChecksums('5.5.1', 'eu')
+```javascript
+getCoreChecksums('5.5.1', 'eu')
+```
 
 ## Get Browser Info
 
 Available API versions: 1.1
 
-	getBrowserInfo(useragent*)
+```javascript
+getBrowserInfo(useragent*)
+```
 
 ###	Usage
 
-	getBrowserInfo('Chrome/86.0')
+```javascript
+getBrowserInfo('Chrome/86.0')
+```
 
 ## Get Core Version Stability Info
 
 Available API versions: 1.0
 
-	getCoreVersionStabilityInfo(wp_version, api_version)
+```javascript
+getCoreVersionStabilityInfo(wp_version, api_version)
+```
 
 ###	Usage
 
-	getCoreVersionStabilityInfo() //returns all versions info
+```javascript
+getCoreVersionStabilityInfo() //returns all versions info
 
-	getCoreVersionStabilityInfo('4.6.20')	//returns specific version info
+
+getCoreVersionStabilityInfo('4.6.20')	//returns specific version info
+```
 
 ## Get Core Statistics
 
 Available API versions: 1.0
 
-
-	getCoreStats(api_version)
+```javascript
+getCoreStats(api_version)
+```
 
 ###	Usage
 
-	getCoreStats()
-
+```javascript
+getCoreStats()
+```
 
 # Plugins
 
@@ -130,79 +163,106 @@ Available API versions: 1.1, 1.2
 
 ## Get plugins list
 
-	getPluginsList(filters, api_version)
+```javascript
+getPluginsList(filters, api_version)
+```
 
 ### Usage
 
-	getPluginsList()
+```javascript
+getPluginsList()
 
-	getPluginsList({
-		tag: ['photography', 'blue'],
-		browse: 'popular',
-		page: 1,
-		per_page: 10,
-		//... other filters
-	})
+getPluginsList({
+	tag: ['photography', 'blue'],
+	browse: 'popular',
+	page: 1,
+	per_page: 10,
+	//... other filters
+})
+```
 
 ##	Filter Plugins By
 
-	filterPluginsBy(filter_key*, filter_value*, page, per_page, api_version)
+```javascript
+filterPluginsBy(filter_key*, filter_value*, page, per_page, api_version)
+```
 
 ### Usage
 
-	filterPluginsBy('search', 'buddypress', 1, 5)
-	filterPluginsBy('tag', ['popup', 'slideshow'])
-	filterPluginsBy('author', 'wordpressdotorg', 2, 3)
-	filterPluginsBy('browse', 'popular')
+```javascript
+filterPluginsBy('search', 'buddypress', 1, 5)
+filterPluginsBy('tag', ['popup', 'slideshow'])
+filterPluginsBy('author', 'wordpressdotorg', 2, 3)
+filterPluginsBy('browse', 'popular')
+```
 
 ## Get Plugins Info
 
-	getPluginInfo(plugin_slug, api_version)
+```javascript
+getPluginInfo(plugin_slug, api_version)
+```
 
 ### Usage
 
-	getPluginInfo('wordpress-seo');
+```javascript
+getPluginInfo('wordpress-seo');
+```
 
 ## Get Plugin Hot Tags List
 
-	getPluginHotTagsList(api_version)
+```javascript
+getPluginHotTagsList(api_version)
+```
 
 Note: tags_count is not implemented in the original api yet
 
 ### Usage
-	getPluginHotTagsList()
 
+```javascript
+getPluginHotTagsList()
+```
 
 ## Get Plugin Translations
 
 Available API versions: 1.0
 
-
-	getPluginTranslations(slug, plugin_version, api_version)
+```javascript
+getPluginTranslations(slug, plugin_version, api_version)
+```
 
 ### Usage
 
-	getPluginTranslations('classic-editor', 1.5);
+```javascript
+getPluginTranslations('classic-editor', 1.5);
+```
 
 ## Get Plugin Downloads
 
 Available API versions: 1.0
 
-	getPluginDownloads(plugin_slug*, limit, api_version)
+```javascript
+getPluginDownloads(plugin_slug*, limit, api_version)
+```
 
 limit: Downloads in last {limit} days
 
 ### Usage
 
-	getPluginDownloads('classic-editor', 7)
+```javascript
+getPluginDownloads('classic-editor', 7)
+```
 
 ## Get Plugin Statistics
 
-	getPluginStats(plugin_slug*, api_version)
+```javascript
+getPluginStats(plugin_slug*, api_version)
+```
 
 ### Usage
 
-	getPluginStats('classic-editor)
+```javascript
+getPluginStats('classic-editor)
+```
 
 # Themes
 
@@ -231,63 +291,83 @@ limit: Downloads in last {limit} days
 
 Available API versions: 1.1, 1.2
 
-	getPluginsList(filters, api_version)
+```javascript
+getPluginsList(filters, api_version)
+```
 
 ### Usage
 
-	getPluginsList()
+```javascript
+getPluginsList()
 
-	getPluginsList({
-		tag: ['photography', 'blue'],
-		browse: 'popular',
-		page: 1,
-		per_page: 10,
-		//... other filters
-	})
+getPluginsList({
+	tag: ['photography', 'blue'],
+	browse: 'popular',
+	page: 1,
+	per_page: 10,
+	//... other filters
+})
+```
 
 ## Filter Themes By
 
-	filterThemesBy(filter_key*, filter_value*, page, per_page, api_version)
+```javascript
+filterThemesBy(filter_key*, filter_value*, page, per_page, api_version)
+```
 
 ### Usage
 
-	filterThemesBy('search', 'grid', 1, 15)
+```javascript
+filterThemesBy('search', 'grid', 1, 15)
 
-	filterThemesBy('tag', ['photography', 'blue'])
+filterThemesBy('tag', ['photography', 'blue'])
 
-	filterThemesBy('theme', 'gridmag')
+filterThemesBy('theme', 'gridmag')
 
-	filterThemesBy('author', 'wordpressdotorg', 2, 3)
+filterThemesBy('author', 'wordpressdotorg', 2, 3)
 
-	filterThemesBy('browse', 'popular')
+filterThemesBy('browse', 'popular')
+```
 
 ## Get Theme Info
 
-   getThemeInfo(theme_slug, api_version)
+```javascript
+getThemeInfo(theme_slug, api_version)
+```
 
 ### Usage
 
-	getThemeInfo('simple-grid')
+```javascript
+getThemeInfo('simple-grid')
+```
 
 ## Get Popular Theme Tags
 
-	getPopularThemeTags(tags_count, api_version)
+```javascript
+getPopularThemeTags(tags_count, api_version)
+```
 
 ### Usage
 
-	getPopularThemeTags()
+```javascript
+getPopularThemeTags()
 
-	getPopularThemeTags(5)
+getPopularThemeTags(5)
+```
 
 ## Get Theme Translations
 
 Available API versions: 1.0
 
-	getThemeTranslations(theme_slug*, theme_version, api_version)
+```javascript
+getThemeTranslations(theme_slug*, theme_version, api_version)
+```
 
 ### Usage:
 
-	getThemeTranslations('grocery-store', 1.0.2)
+```javascript
+getThemeTranslations('grocery-store', 1.0.2)
+```
 
 # Events
 
@@ -313,25 +393,26 @@ Filters list
 
 * locale(string)
 
-
-
-	getEventDetails(params, api_version)
+```javascript
+getEventDetails(params, api_version)
+```
 
 ### Usage
 
-	getEventDetails({ country: 'IT' });
+```javascript
+getEventDetails({ country: 'IT' });
 
-	getEventDetails({ ip: '136.0.16.1' })
+getEventDetails({ ip: '136.0.16.1' })
 
-	getEventDetails({
-		latitude: '41.900001525879'
-		longitude: '12.479999542236'
-	})
+getEventDetails({
+	latitude: '41.900001525879'
+	longitude: '12.479999542236'
+})
 
-	getEventDetails({ location: 'Australia' })
+getEventDetails({ location: 'Australia' })
 
-	getEventDetails({ number:5, location:'Australia' })
-
+getEventDetails({ number:5, location:'Australia' })
+```
 
 # Others
 
@@ -339,35 +420,47 @@ Filters list
 
 Available API versions: 1.0
 
-	getStats(type, api_version)
+```javascript
+getStats(type, api_version)
+```
 
 ### Usage
 
-	getStats('php')
+```javascript
+getStats('php')
 
-	getStats('mysql')
+getStats('mysql')
 
-	getStats('wordpress')
+getStats('wordpress')
+```
 
 ## Generate Secret Key
 
 Available API versions: 1.1
 
-	generateSecretKey(api_version)
+```javascript
+generateSecretKey(api_version)
+```
 
 ### Usage
 
-	generateSecretKey()
+```javascript
+generateSecretKey()
+```
 
 ## List of popular import plugins in the WordPress Plugin Directory used by Tools → Import Screen.
 
 Available API version: 1.1
 
-	getPopularImportPlugins(api_version)
+```javascript
+getPopularImportPlugins(api_version)
+```
 
 ### Usage
 
-	getPopularImportPlugins()
+```javascript
+getPopularImportPlugins()
+```
 
 
 
