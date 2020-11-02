@@ -233,7 +233,7 @@ getPluginTranslations(slug, plugin_version, api_version)
 ### Usage
 
 ```javascript
-getPluginTranslations('classic-editor', 1.5);
+getPluginTranslations('classic-editor', '1.5');
 ```
 
 ## Get Plugin Downloads
@@ -261,7 +261,7 @@ getPluginStats(plugin_slug*, api_version)
 ### Usage
 
 ```javascript
-getPluginStats('classic-editor)
+getPluginStats('classic-editor')
 ```
 
 # Themes
@@ -366,7 +366,7 @@ getThemeTranslations(theme_slug*, theme_version, api_version)
 ### Usage:
 
 ```javascript
-getThemeTranslations('grocery-store', 1.0.2)
+getThemeTranslations('grocery-store', '1.0.2')
 ```
 
 # Events
