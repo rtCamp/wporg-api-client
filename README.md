@@ -1,35 +1,68 @@
-# wporg-api-client
-WordPress.org API client built in node.js
+# WpOrg: Node.js Client
+### WordPress.org Client Library for Node.js
 
 # Installation
-npm install wporg-api-client
+	npm i @rtcamp/wporg-api-client
 
 Note: add `--save` if you are using npm < 5.0.0
 
-# Example
+This library exposes methods for all the APIs listed here: https://codex.wordpress.org/WordPress.org_API
+
+# Examples
+
+### Fetch All Plugins List
 
 ```javascript
-//To Fetch All Plugins List
 
-const { getPluginsList } = require("wporg-api-client");
+const { getPluginsList } = require("@rtcamp/wporg-api-client");
 
-const pluginsList = async () => {
-	let data = {};
+const fetchPluginsList = async () => {
+	let pluginsList = {};
 
 	try {
-		data = await getPluginsList();
-		console.log(data, "data");
+		pluginsList = await getPluginsList();
+		console.log(pluginsList, "pluginsList");
 	} catch (error) {
 		console.log(error.message, "error");
 	}
 };
 
-pluginsList();
+fetchPluginsList();
 ```
+### Get Plugin Downloads Count
+
+```javascript
+
+const { getPluginDownloads } = require("@rtcamp/wporg-api-client")
+
+const fetchPluginDownloads = async (plugin_slug) => {
+	let downloadsCount = 0;
+
+	try {
+		const apiResponse = await getPluginDownloads(plugin_slug);
+
+		downloadsCount = apiResponse.data
+
+		console.log(downloadsCount, "downloadsCount");
+	} catch (error) {
+		console.log(error.message, "error");
+	}
+}
+
+fetchPluginDownloads("contact-form-7")
+
+```
+
+List Of Methods:
+
+* <a href="#core">Core</a>
+* <a href="#plugins">Plugins</a>
+* <a href="#themes">Themes</a>
+* <a href="#others">Others</a>
 
 Note: Asterisk(*) is used to denote required arguments
 
-# Core
+# <h1 id="core">Core</h1>
 
 ## Get Core Translation
 
@@ -134,7 +167,7 @@ getCoreStats(api_version)
 getCoreStats()
 ```
 
-# Plugins
+# <h1 id="plugins">Plugins</h1>
 
 **Filters list**
 
@@ -264,7 +297,7 @@ getPluginStats(plugin_slug*, api_version)
 getPluginStats('classic-editor')
 ```
 
-# Themes
+# <h1 id="themes">Themes</h1>
 
 **Filters list**
 
@@ -369,7 +402,7 @@ getThemeTranslations(theme_slug*, theme_version, api_version)
 getThemeTranslations('grocery-store', '1.0.2')
 ```
 
-# Events
+# <h1 id="events">Events</h1>
 
 ## Get Upcoming WordCamps and meetups details, filterable by location.
 
@@ -414,7 +447,7 @@ getEventDetails({ location: 'Australia' })
 getEventDetails({ number:5, location:'Australia' })
 ```
 
-# Others
+# <h1 id="others">Others</h1>
 
 ## Get Statistics of Php, MySql and Wordpress
 
