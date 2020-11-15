@@ -2,7 +2,7 @@
 ### WordPress.org Client Library for Node.js
 
 # Installation
-	npm i @rtcamp/wporg-api-client
+	npm i wporg-api-client
 
 Note: add `--save` if you are using npm < 5.0.0
 
@@ -14,7 +14,7 @@ This library exposes methods for all the APIs listed here: https://codex.wordpre
 
 ```javascript
 
-const { getPluginsList } = require("@rtcamp/wporg-api-client");
+const { getPluginsList } = require("wporg-api-client");
 
 const fetchPluginsList = async () => {
 	let pluginsList = {};
@@ -33,7 +33,7 @@ fetchPluginsList();
 
 ```javascript
 
-const { getPluginDownloads } = require("@rtcamp/wporg-api-client")
+const { getPluginDownloads } = require("wporg-api-client")
 
 const fetchPluginDownloads = async (plugin_slug) => {
 	let downloadsCount = 0;
