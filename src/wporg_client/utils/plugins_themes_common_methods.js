@@ -275,10 +275,20 @@ const createParamsObj = (params) => {
         let key = `request[${property}]`;
         let value = params[property];
 
-        paramsObj = {
-            ...paramsObj,
-            [key]: value,
-        };
+        if ( 'object' === typeof value ) {
+            for ( let index in value ) {
+                let subKey = key + `[${ index }]`;
+                paramsObj = {
+                    ...paramsObj,
+                    [ subKey ]: value[ index ],
+                };
+            }
+        } else {
+            paramsObj = {
+                ...paramsObj,
+                [ key ]: value,
+            };
+        }
     }
 
     return paramsObj;
