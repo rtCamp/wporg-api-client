@@ -11,7 +11,7 @@ const query_themes_params = {
     page: 'number', //default: 1
     per_page: 'number', //default: 24
     browse: 'string', //any one value from browse_values array
-    fields: 'array',
+    fields: 'object',
 };
 
 /** Same as above but have removed page and page_no, as in case of filters they are coming as args
@@ -37,7 +37,7 @@ const query_plugins_params = {
     page: 'number', //default: 1
     per_page: 'number', //default: 24
     browse: 'string', //any one value from browse_values array
-    fields: 'array',
+    fields: 'object',
 };
 
 /** Same as above but have removed page and page_no, as in case of filters they are coming as args
