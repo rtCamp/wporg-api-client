@@ -26,7 +26,7 @@ const translationType = Array.isArray(TRANSLATION_API_TYPES) && TRANSLATION_API_
  * utils => themes_info => params => query_plugins_params
  * @param {String} api_version
  */
-const getPluginsList = (filters = {}, api_version) => {
+const getPluginsList = async (filters = {}, api_version) => {
     const { isValid, errors } = isInfoListParamsValid(filters, infoType);
 
     if (!isValid) {
@@ -38,13 +38,8 @@ const getPluginsList = (filters = {}, api_version) => {
         ...createParamsObj(filters),
     };
 
-    /** We're concatenating tag param in url when tag is an array of strings because
-     * 	params object can not have two properties with the same key
-     * */
+    /** Concatenate tag param if it's an array */
     let concatenatedTags = '';
-    /** Checking if tag exists in params object amd it's an array, if not an array then
-     * 	will be handled like normal filter
-     * */
     if ('tag' in filters && Array.isArray(filters['tag'])) {
         const tag_array = filters['tag'];
         concatenatedTags = concatenateTags(tag_array);
@@ -61,7 +56,11 @@ const getPluginsList = (filters = {}, api_version) => {
 
     const url = `/${infoType}${INFO_API}/${api_version}?${concatenatedTags}`;
 
-    return fetchInfo(url, params);
+    // Await the fetchInfo response
+    const response = await fetchInfo(url, params);
+
+    // Return only the plugins array
+    return response.plugins || [];
 };
 
 /**
