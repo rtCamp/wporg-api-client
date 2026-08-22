@@ -7,4 +7,12 @@ module.exports = {
     arrowParens: 'always',
     tabWidth: 4,
     semi: true,
+    overrides: [
+        {
+            files: ['*.yml', '*.yaml'],
+            options: {
+                tabWidth: 2,
+            },
+        },
+    ],
 };
